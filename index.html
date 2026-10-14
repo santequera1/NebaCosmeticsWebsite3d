@@ -640,7 +640,7 @@
     }
 
     /* Contenidos internos sobre el fondo interactivo */
-    .prod-tag, .prod-3d, .prod-info {
+    .prod-tag, .prod-3d, .prod-info, .prod-img-mobile {
       position: relative;
       z-index: 2;
     }
@@ -1209,6 +1209,10 @@
         text-align: center !important;
         z-index: 10;
         pointer-events: auto;
+        background: transparent !important;
+      }
+      .hero-left .slides, .hero-left .slide, .hero-desc {
+        background: transparent !important;
       }
       .hero-left .slides {
         width: 100%;
@@ -1284,11 +1288,12 @@
         display: block !important;
         width: 100% !important;
         height: 28px !important;
+        background: #f3f9f4 !important;
         margin-top: -1px !important;
-        margin-bottom: -1px !important;
+        margin-bottom: 0 !important;
       }
       .benefits-inner {
-        padding: 30px 5vw 36px !important;
+        padding: 85px 5vw 45px !important;
         min-height: auto !important;
       }
       .benefit-cta {
@@ -1298,7 +1303,7 @@
       /* 5. Beneficios: 4 tarjetas en scroll horizontal fluido (swipe) */
       .statement {
         font-size: clamp(1.9rem, 6vw, 2.5rem) !important;
-        margin: 24px auto 18px !important;
+        margin: 20px auto 18px !important;
         line-height: 1.25;
       }
       .statement-sub {
@@ -1361,6 +1366,8 @@
       }
       .prod-img-mobile {
         display: block !important;
+        position: relative !important;
+        z-index: 3 !important;
         height: 250px;
         width: auto;
         max-width: 80%;
@@ -1620,12 +1627,12 @@
     <div class="benefit-cta"><a class="btn btn-white" href="#ingredientes">Conoce los ingredientes ↓</a></div>
   </div>
 
-  <!-- Scallop inferior para separar la segunda sección (Beneficios) de la tercera (Ingredientes) -->
-  <svg class="scallop-bottom scallop-bottom-desktop" viewBox="0 0 1200 64" preserveAspectRatio="none" aria-hidden="true">
-    <path fill="#f3f9f4" d="M0,0 Q37.5,80 75,0 Q112.5,80 150,0 Q187.5,80 225,0 Q262.5,80 300,0 Q337.5,80 375,0 Q412.5,80 450,0 Q487.5,80 525,0 Q562.5,80 600,0 Q637.5,80 675,0 Q712.5,80 750,0 Q787.5,80 825,0 Q862.5,80 900,0 Q937.5,80 975,0 Q1012.5,80 1050,0 Q1087.5,80 1125,0 Q1162.5,80 1200,0 Z"/>
+  <!-- Scallop inferior para separar la segunda sección (Beneficios) de la tercera (Ingredientes) sin ninguna transparencia -->
+  <svg class="scallop-bottom scallop-bottom-desktop" viewBox="0 0 1200 48" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:48px;background:#f3f9f4;margin:0;vertical-align:bottom;">
+    <path fill="#0f4d2e" d="M0,0 L1200,0 L1200,12 Q1125,48 1050,12 Q975,48 900,12 Q825,48 750,12 Q675,48 600,12 Q525,48 450,12 Q375,48 300,12 Q225,48 150,12 Q75,48 0,12 Z"/>
   </svg>
-  <svg class="scallop-bottom scallop-bottom-mobile" viewBox="0 0 400 32" preserveAspectRatio="none" aria-hidden="true">
-    <path fill="#f3f9f4" d="M0,0 Q50,26 100,0 Q150,26 200,0 Q250,26 300,0 Q350,26 400,0 Z"/>
+  <svg class="scallop-bottom scallop-bottom-mobile" viewBox="0 0 400 28" preserveAspectRatio="none" aria-hidden="true" style="display:none;width:100%;height:28px;background:#f3f9f4;margin:0;vertical-align:bottom;">
+    <path fill="#0f4d2e" d="M0,0 L400,0 L400,8 Q350,28 300,8 Q250,28 200,8 Q150,28 100,8 Q50,28 0,8 Z"/>
   </svg>
 </section>
 
@@ -2531,7 +2538,7 @@
     }
   });
 
-  // Salida del tubo HACIA ARRIBA mientras la sección verde sube por encima del hero
+  // Salida del frasco hacia abajo y desvanecimiento suave de textos al entrar Beneficios
   const heroFloor = document.querySelector('.hero-floor');
   ScrollTrigger.create({
     trigger: '#beneficios', start: 'top 55%',
@@ -2542,10 +2549,19 @@
     trigger: '#beneficios', start: 'top bottom', end: 'top top',
     onUpdate: self => {
       const e = self.progress;
-      heroExitY = e * 0.55;
-      heroExitRotX = -e * 0.25;
-      heroExitScale = 1 - e * 0.1;
-      if (heroFloor) heroFloor.style.opacity = String(1 - e);
+      const isMob = window.innerWidth <= 768;
+      // En móvil el frasco desciende elegantemente (-Y), evitando pasar por detrás del texto
+      heroExitY = isMob ? (-e * 0.75) : (-e * 0.45);
+      heroExitRotX = isMob ? (e * 0.2) : (-e * 0.25);
+      heroExitScale = Math.max(0, 1 - e * 0.35);
+      if (heroFloor) heroFloor.style.opacity = String(Math.max(0, 1 - e * 1.5));
+
+      // Desvanecer textos del Hero limpiamente
+      const heroLeftEl = document.querySelector('.hero-left');
+      if (heroLeftEl) {
+        heroLeftEl.style.opacity = String(Math.max(0, 1 - e * 2.2));
+        heroLeftEl.style.transform = isMob ? `translateY(${-e * 35}px)` : `translateY(calc(-50% - ${e * 35}px))`;
+      }
     }
   });
 
