@@ -6,6 +6,7 @@ arte_tuboneba.pdf
 info/
 
 # Backups and intermediate HTML versions
+index_desktop_ok_backup.html
 index_v*.html
 seccion_etiqueta_ingredientes.html
 viewer.html
