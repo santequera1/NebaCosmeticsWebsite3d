@@ -474,13 +474,19 @@
     }
 
     /* Caja de palabra única: NUNCA se cortan las palabras */
+    .statement-swap-wrap {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
     .word-swap {
       display: inline-flex; align-items: center; justify-content: center;
       vertical-align: middle;
       background: var(--yellow); color: var(--green-900);
       border-radius: 14px; padding: 4px 26px; transform: rotate(-2deg);
       box-shadow: 0 10px 28px rgba(244,196,48,.4);
-      min-width: 230px; height: 1.25em; line-height: 1.25em; margin: 0 8px;
+      min-width: 230px; height: 1.25em; line-height: 1.25em;
+      margin: 0 0 0 10px;
     }
     .word-text {
       display: inline-block;
@@ -1436,8 +1442,9 @@
         margin-bottom: 30px !important;
       }
       .word-swap {
-        min-width: 160px;
-        padding: 3px 14px;
+        min-width: 145px;
+        padding: 3px 12px;
+        margin: 0 0 0 6px !important;
       }
       .benefit-grid {
         display: flex !important;
@@ -1761,9 +1768,7 @@
 
     <h2 class="statement">
       Profundamente refrescante, naturalmente
-      <span class="word-swap" id="wordSwap">
-        <span class="word-text" id="wordText">PURO</span>
-      </span>,
+      <span class="statement-swap-wrap"><span class="word-swap" id="wordSwap"><span class="word-text" id="wordText">PURO</span></span>,</span>
       para tu belleza y bienestar.
     </h2>
     <p class="statement-sub">Revitaliza tu cuerpo con NEBA-10, un gel corporal botánico diseñado para acompañarte en tu recuperación y descanso diario.</p>
@@ -1919,9 +1924,27 @@
   .etq-foot { text-align: center; font-family: var(--etq-title); color: var(--etq-green-dk); }
   .etq-foot .etq-row { display: flex; justify-content: center; gap: 34px; font-weight: 600; font-size: .9rem; color: var(--etq-muted); font-variant-numeric: tabular-nums; }
   .etq-foot .etq-reg { margin-top: 18px; font-size: .8rem; letter-spacing: 1.4px; font-weight: 800; color: var(--etq-orange); text-transform: uppercase; }
-  .etq-foot .etq-val { font-weight: 800; font-size: .95rem; margin-top: 2px; }
-  .etq-foot .etq-thanks { margin: 22px 0 6px; color: var(--etq-muted); font-family: var(--etq-body); font-size: .95rem; }
-  .etq-barcode { display: block; width: 100%; height: 74px; margin: 18px 0 6px; }
+  .etq-foot .etq-thanks {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 22px 0 8px;
+    color: var(--etq-muted);
+    font-family: var(--etq-body);
+    font-size: clamp(0.74rem, 2.7vw, 0.92rem);
+    width: 100%;
+  }
+  .etq-thanks-line {
+    flex: 1;
+    max-width: 42px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.45;
+  }
+  .etq-thanks-text {
+    white-space: nowrap;
+  }
   .etq-code { font-size: .78rem; letter-spacing: 6px; color: var(--etq-ink); }
   .etq-weight { font-weight: 900; font-style: italic; font-size: 1.5rem; margin-top: 14px; color: var(--etq-green-dk); }
 
@@ -2061,7 +2084,11 @@
         <div class="etq-val">LABORATORIOS VIM S.A.S.</div>
         <div class="etq-reg">Para</div>
         <div class="etq-val">NEBADON COSMETICS S.A.S.<br>Cartagena de Indias, Colombia</div>
-        <div class="etq-thanks">——— Gracias por cuidarte al natural ———</div>
+        <div class="etq-thanks">
+          <span class="etq-thanks-line"></span>
+          <span class="etq-thanks-text">Gracias por cuidarte al natural</span>
+          <span class="etq-thanks-line"></span>
+        </div>
         <svg class="etq-barcode" id="etqBarcode" preserveAspectRatio="none" aria-hidden="true"></svg>
         <div class="etq-code">CI:219014_8901_519</div>
         <div class="etq-weight">200g</div>
