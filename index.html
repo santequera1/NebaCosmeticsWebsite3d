@@ -1,0 +1,2517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEBA Cosmetics — Cuidado corporal y bienestar botánico</title>
+  <meta name="description" content="NEBA-10 Gel Corporal con 6 extractos herbales: Cannabis Sativa, Árnica Montana, Romero, Eucalipto, Hierbabuena y Caléndula. Envío incluido a toda Colombia.">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
+
+  <!-- Google Fonts: Bebas Neue (menú original), Montserrat (títulos/botones) y Comfortaa (textos/cuerpo) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Comfortaa:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Three.js r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- Modelo 3D de Blender en base64 -->
+  <script src="neba10_tubo_blender.js"></script>
+  <script src="neba10_caja_blender.js"></script>
+  <!-- Script oficial de Instagram Embeds con protocolo seguro -->
+  <script async src="https://www.instagram.com/embed.js"></script>
+
+  <style>
+    :root {
+      --green-border:  #00A551;
+      --green-vibrant: #00A551;
+      --green-dark:    #0f4d2e;
+      --green-900:     #0b3d24;
+      --green-800:     #0f4d2e;
+      --green-700:     #066A38;
+      --green-500:     #00A551;
+      --green-300:     #9fd1a8;
+      --green-100:     #e8f3ea;
+      --green-50:      #f3f9f4;
+      --wa: #22C25E;
+      --orange: #E8821E;
+      --sky: #29ABE2;
+      --yellow: #F4C430;
+      --ink: #17241b;
+      --muted: #4e5e53;
+      --white: #ffffff;
+      --line: rgba(23, 36, 27, 0.10);
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --font-title: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Comfortaa', cursive, system-ui, sans-serif;
+      --font-menu: 'Bebas Neue', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--white);
+      color: var(--ink);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    h1, h2, h3, h4, h5, h6,
+    .title-font, .price, .prod-tag, .eyebrow,
+    .field label, .progress-meta, .statement,
+    .comm-tag, .video-badge, .btn-order {
+      font-family: var(--font-title);
+      font-weight: 800;
+    }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.74rem; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase;
+      color: var(--green-700); background: var(--green-100);
+      padding: 6px 14px; border-radius: 999px;
+    }
+    .icon { width: 1em; height: 1em; fill: currentColor; flex-shrink: 0; }
+
+    /* ============ BOTONES GENERALES: un solo estilo para toda la página (el de "Lo quiero") ============ */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      border: 2px solid transparent; cursor: pointer; border-radius: 999px; text-decoration: none; white-space: nowrap;
+      font-family: var(--font-title); font-weight: 800; font-size: .9rem; letter-spacing: .6px; text-transform: uppercase;
+      padding: 15px 28px;
+      transition: transform .25s var(--ease), background .25s, box-shadow .25s, color .25s, border-color .25s;
+    }
+    .btn:hover { transform: translateY(-3px); }
+    .btn .icon { font-size: 1.15rem; }
+    /* Verde (principal) */
+    .btn-green { background: var(--green-vibrant); color: #fff; box-shadow: 0 10px 24px rgba(0,165,81,.28); }
+    .btn-green:hover { background: var(--green-700); }
+    /* Blanco: para fondos verdes oscuros */
+    .btn-white { background: #fff; color: var(--green-800); box-shadow: 0 10px 24px rgba(0,0,0,.14); }
+    .btn-white:hover { background: var(--yellow); color: var(--green-900); }
+    /* Contorno: acción secundaria sobre fondo claro */
+    .btn-outline { background: transparent; color: var(--green-700); border-color: var(--green-vibrant); }
+    .btn-outline:hover { background: var(--green-vibrant); color: #fff; }
+
+    /* ============ HEADER CON LOS 3 BOTONES EN BLANCO Y BORDE VERDE ============ */
+    header {
+      position: fixed; inset: 0 0 auto 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 40px;
+      pointer-events: none;
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: none !important;
+      border: none !important;
+      transition: padding .35s;
+    }
+    header > * { pointer-events: auto; }
+    header.scrolled {
+      padding: 12px 40px;
+      background: transparent !important;
+      backdrop-filter: none !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+
+    .header-logo {
+      display: flex; align-items: center; position: relative;
+      transition: transform .8s var(--ease);
+    }
+    /* Durante el hero el logo va centrado; al salir del hero vuelve a la esquina */
+    header.is-hero .header-logo { transform: translateX(calc(50vw - 40px - 50%)); }
+    .header-logo .logo-white { position: absolute; left: 0; top: 50%; transform: translateY(-50%); opacity: 0; transition: opacity .5s, height .35s; }
+    .header-logo .logo-color { transition: opacity .5s, height .35s; }
+    header.on-green .header-logo .logo-color { opacity: 0; }
+    header.on-green .header-logo .logo-white { opacity: 1; }
+    header.is-hero .header-logo img, header.is-hero.scrolled .header-logo img { height: 70px; }
+    .header-logo img {
+      height: 58px; width: auto; object-fit: contain;
+    }
+    header.scrolled .header-logo img { height: 48px; }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+
+    /* Botón WhatsApp */
+    .header-actions .btn-header-wa {
+      background: #ffffff !important;
+      color: var(--green-border) !important;
+      border: 1.5px solid var(--green-border) !important;
+      font-family: var(--font-title);
+      font-weight: 500 !important;
+      font-size: .84rem;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(0,0,0,.06);
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: transform .25s var(--ease), background .25s, box-shadow .25s, color .25s;
+    }
+    .header-actions .btn-header-wa:hover {
+      background: #f0faf3 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,165,81,.2);
+    }
+    .header-actions .btn-header-wa .icon {
+      fill: var(--green-border) !important;
+      font-size: 1.15rem;
+    }
+
+    /* Botón Comprar */
+    .header-actions .btn-header-buy {
+      background: #ffffff !important;
+      color: var(--green-border) !important;
+      border: 1.5px solid var(--green-border) !important;
+      font-family: var(--font-title);
+      font-weight: 500 !important;
+      font-size: .84rem;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(0,0,0,.06);
+      transition: transform .25s var(--ease), background .25s, box-shadow .25s, color .25s;
+    }
+    .header-actions .btn-header-buy:hover {
+      background: var(--green-border) !important;
+      color: #ffffff !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,165,81,.25);
+    }
+
+    /* Botón Menú con el MISMO borde verde y fondo blanco */
+    .menu-btn {
+      background: #ffffff !important;
+      color: var(--green-border) !important;
+      border: 1.5px solid var(--green-border) !important;
+      font-family: var(--font-title);
+      font-weight: 500 !important;
+      font-size: .84rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 10px 22px;
+      border-radius: 999px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,.06);
+      transition: transform .2s var(--ease), background .2s, color .2s, box-shadow .2s;
+    }
+    .menu-btn .bars { display: grid; gap: 4px; }
+    .menu-btn .bars span {
+      width: 16px; height: 2px;
+      background: var(--green-border);
+      border-radius: 2px; display: block;
+      transition: background .2s;
+    }
+    .menu-btn:hover {
+      transform: translateY(-2px);
+      background: var(--green-border) !important;
+      color: #ffffff !important;
+      box-shadow: 0 6px 18px rgba(0,165,81,.25);
+    }
+    .menu-btn:hover .bars span { background: #ffffff; }
+
+    /* ============ MENÚ FULLSCREEN ============ */
+    .fs-menu {
+      position: fixed; inset: 0; z-index: 200;
+      background: radial-gradient(120% 90% at 80% 10%, #0d7a43 0%, var(--green-700) 35%, var(--green-900) 100%);
+      color: #fff; display: flex; flex-direction: column;
+      padding: 24px 44px 34px;
+      clip-path: circle(0% at calc(100% - 80px) 40px);
+      transition: clip-path .8s var(--ease);
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .fs-menu.open { clip-path: circle(150% at calc(100% - 80px) 40px); pointer-events: auto; }
+    .fs-menu-watermark {
+      position: absolute; right: -6%; bottom: -10%; width: 55vw; max-width: 800px;
+      opacity: .08; pointer-events: none;
+    }
+    .fs-top { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; }
+    .fs-top img { height: 52px; width: auto; object-fit: contain; filter: none !important; -webkit-filter: none !important; box-shadow: none !important; }
+    .close-btn {
+      background: #fff; color: var(--green-800); border: none; cursor: pointer;
+      letter-spacing: .8px; font-size: .88rem; font-family: var(--font-title); font-weight: 700;
+      padding: 11px 24px; border-radius: 999px; transition: transform .2s;
+    }
+    .close-btn:hover { transform: scale(1.05); }
+    .fs-body {
+      position: relative; z-index: 2; flex: 1;
+      display: grid; grid-template-columns: 1.25fr 1fr; gap: 50px; align-items: center;
+      max-width: 1240px; width: 100%; margin: 0 auto;
+    }
+    .fs-nav-wrap { display: flex; flex-direction: column; }
+    .fs-links { display: flex; flex-direction: column; gap: 8px; }
+
+    /* Fuente Montserrat para el Menú Fullscreen (alrededor de 2.85rem / 3rem según preferencia) */
+    .fs-link {
+      font-family: var(--font-title) !important;
+      font-weight: 700;
+      font-size: clamp(2.2rem, 3.2vw, 2.85rem);
+      line-height: 1.2;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 16px;
+      opacity: 0; transform: translateY(30px);
+      transition: opacity .5s var(--ease), transform .3s var(--ease), color .25s ease;
+    }
+    .fs-link small {
+      font-family: var(--font-title);
+      font-size: .85rem;
+      font-weight: 800;
+      color: var(--yellow);
+      letter-spacing: 1px;
+      opacity: .85;
+      transition: opacity .25s;
+    }
+    .fs-link:hover {
+      color: var(--yellow);
+      transform: translateX(12px) !important;
+    }
+    .fs-link:hover small { opacity: 1; }
+    .fs-link::after {
+      content: '→'; opacity: 0; transform: translateX(-10px); font-size: .8em; color: var(--yellow);
+      transition: opacity .25s ease, transform .3s var(--ease);
+    }
+    .fs-link:hover::after { opacity: 1; transform: translateX(0); }
+
+    .fs-menu.open .fs-link { opacity: 1; transform: none; }
+    .fs-menu.open .fs-link:nth-child(1) { transition-delay: .20s; }
+    .fs-menu.open .fs-link:nth-child(2) { transition-delay: .26s; }
+    .fs-menu.open .fs-link:nth-child(3) { transition-delay: .32s; }
+    .fs-menu.open .fs-link:nth-child(4) { transition-delay: .38s; }
+    .fs-menu.open .fs-link:nth-child(5) { transition-delay: .44s; }
+    .fs-menu.open .fs-link:nth-child(6) { transition-delay: .50s; }
+
+    /* Botón Ver Presentaciones y Precios con espacio holgado y visibilidad óptima */
+    .fs-buy {
+      margin-top: 32px;
+      opacity: 0; transform: translateY(20px);
+    }
+    .fs-buy .btn-white {
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: .92rem;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      padding: 13px 26px;
+    }
+    .fs-menu.open .fs-buy { opacity: 1; transform: none; transition: all .6s var(--ease) .5s; }
+
+    .fs-products { opacity: 0; transform: translateX(40px); }
+    .fs-menu.open .fs-products { opacity: 1; transform: none; transition: all .8s var(--ease) .45s; }
+    .fs-products h4 { font-size: .8rem; letter-spacing: 1.6px; text-transform: uppercase; opacity: .75; margin: 0; font-family: var(--font-title); }
+    .fs-products-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+    .fs-quick { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn.btn-sm { padding: 10px 18px; font-size: .78rem; }
+    .btn-ghost-light { background: transparent; color: #fff; border-color: rgba(255,255,255,.7); }
+    .btn-ghost-light:hover { background: #fff; color: var(--green-800); }
+    .fs-prod {
+      display: flex; align-items: center; gap: 16px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+      border-radius: 20px; padding: 12px 18px 12px 12px; margin-bottom: 12px;
+      transition: background .25s, transform .25s var(--ease);
+    }
+    .fs-prod:hover { background: rgba(255,255,255,.16); transform: translateX(-4px); }
+    .fs-prod img { width: 68px; height: 68px; object-fit: contain; background: #fff; border-radius: 14px; padding: 4px; }
+    .fs-prod strong { display: block; font-size: 1rem; font-family: var(--font-title); }
+    .fs-prod span { font-size: .82rem; opacity: .8; font-family: var(--font-body); }
+    .fs-prod .arrow { margin-left: auto; font-size: 1.2rem; }
+    .fs-footer {
+      position: relative; z-index: 2;
+      display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+      font-size: .82rem; opacity: .7; border-top: 1px solid rgba(255,255,255,.14);
+      padding-top: 18px; font-family: var(--font-body);
+    }
+
+    /* ============ HERO: VIDEO DE FONDO 100% VISIBLE (SIN CAPA ENCIMA) ============ */
+    .hero { position: relative; height: 580vh; }
+    .hero-stage {
+      position: sticky; top: 0; height: 100vh; overflow: hidden;
+      background: transparent;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      overflow: hidden;
+      will-change: transform;
+    }
+    .hero-bg-video {
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: 1 !important; /* Video 100% visible, sin opacidad reducida */
+      filter: none;
+      display: block;
+    }
+    /* Capa verde NEBA (multiplica sobre el video: el blanco se vuelve verde y las hojas se oscurecen) */
+    .hero-tint { position: absolute; inset: 0; background: #0b7a43; mix-blend-mode: multiply; opacity: 0; pointer-events: none; }
+    .hero-stage .hero-giant span, .progress-meta, .scroll-hint { transition: color .6s; }
+    .hero-stage.on-green .hero-giant span { color: #ffffff; }
+    .hero-stage.on-green .progress-meta, .hero-stage.on-green .scroll-hint { color: #fff; }
+    .hero-stage.on-green .scroll-hint i { background: #fff; }
+    .hero-stage.on-green .hero-left { text-shadow: none; }
+    /* Slide 2 vive sobre el fondo verde: textos claros */
+    .slide.slide-green .hero-brand { color: #ffffff; }
+    .slide.slide-green .hero-sub { color: #b8f0cd; }
+    .slide.slide-green .hero-desc { color: rgba(255,255,255,.86); }
+    .slide.slide-green .hero-desc strong { color: #fff; }
+    .hero-giant {
+      position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+    }
+    .hero-giant span {
+      grid-area: 1 / 1; font-family: var(--font-title); font-size: 19vw; line-height: 1;
+      font-weight: 900; color: var(--green-vibrant); opacity: 0; white-space: nowrap;
+    }
+    .hero-giant span:first-child { opacity: .08; }
+    #hero-3d {
+      position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+      width: min(46vw, 640px); height: 100vh; z-index: 5; cursor: grab;
+    }
+    #hero-3d:active { cursor: grabbing; }
+    #hero-3d canvas { display: block; }
+    .hero-floor {
+      position: absolute; left: 50%; bottom: 9vh; transform: translateX(-50%);
+      width: 260px; height: 38px; border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(11,61,36,.28) 0%, rgba(11,61,36,0) 70%);
+      z-index: 4; pointer-events: none;
+    }
+    .hero-col { position: absolute; top: 50%; transform: translateY(-50%); z-index: 6; }
+    .hero-left {
+      /* Anclada al centro (donde está el tubo): el texto termina ~70px antes del tubo en cualquier ancho */
+      left: max(4.5vw, calc(50% - 170px - min(440px, 34vw)));
+      width: min(440px, 34vw);
+      max-width: 440px;
+      text-shadow: 0 2px 10px rgba(255,255,255,0.7);
+    }
+    .hero-right { display: none !important; }
+    .slides { display: grid; }
+    .slide { grid-area: 1 / 1; }
+    .slide + .slide { opacity: 0; visibility: hidden; }
+
+    /* Jerarquía visual del Hero: NEBA-10 grande y llamativo, GEL CORPORAL más pequeño y refinado */
+    .hero-title {
+      margin: 8px 0 16px;
+    }
+    /* Títulos del hero: mismo estilo que "6 plantas, una sola fórmula." */
+    .hero-left { container-type: inline-size; }
+    .hero-title { margin: 0 0 18px; }
+    .hero-brand, .hero-sub {
+      display: block;
+      font-family: var(--font-title);
+      font-weight: 900;
+      font-size: clamp(2.3rem, 12.5cqi, 3.7rem);  /* se ajusta a la columna: nunca tapa el tubo */
+      line-height: 1.02;
+      letter-spacing: -1px;
+      text-transform: none;
+      white-space: nowrap;
+    }
+    .hero-brand { color: var(--green-700); }
+    .hero-sub   { color: var(--green-vibrant); }
+
+    .hero-desc { font-size: 1.05rem; color: var(--muted); line-height: 1.65; font-weight: 500; max-width: 400px; }
+    .hero-desc strong { color: var(--green-700); font-weight: 700; }
+    .progress { margin-top: 26px; max-width: 400px; }
+    .progress-meta { display: flex; justify-content: space-between; font-size: 0.95rem; color: var(--green-800); margin-bottom: 8px; font-family: var(--font-title); font-weight: 700; }
+    .progress-track { height: 6px; background: rgba(255,255,255,0.7); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
+    .progress-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--green-vibrant), var(--orange)); transform-origin: left; transform: scaleX(.12); }
+    .scroll-hint {
+      position: absolute; left: 50%; bottom: 3vh; transform: translateX(-50%); z-index: 6;
+      font-size: .74rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--green-700);
+      font-family: var(--font-title); display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .scroll-hint i { width: 2px; height: 26px; background: var(--green-700); border-radius: 2px; animation: drip 1.6s infinite; }
+    @keyframes drip { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+    /* ============ BENEFICIOS: ENTRA NATURALMENTE DESPUÉS DE LOS 3 SLIDES DEL HERO ============ */
+    .benefits {
+      position: relative; z-index: 20;
+      margin-top: -100vh; /* Se desliza por encima del hero fijo (efecto cortina) */
+      color: #fff;
+    }
+    .scallop { display: block; width: 100%; height: 64px; margin-bottom: -1px; }
+    .benefits-inner {
+      background: linear-gradient(180deg, var(--green-700) 0%, var(--green-800) 100%);
+      padding: 50px 6vw 120px; position: relative; overflow: hidden;
+      min-height: 100vh;
+    }
+    .benefits-leaf { position: absolute; width: 340px; opacity: .14; pointer-events: none; }
+    .statement {
+      font-size: clamp(2.3rem, 5vw, 4.8rem); line-height: 1.18;
+      text-align: center; max-width: 1150px; margin: 40px auto 28px; letter-spacing: -0.5px;
+    }
+
+    /* Caja de palabra única: NUNCA se cortan las palabras */
+    .word-swap {
+      display: inline-flex; align-items: center; justify-content: center;
+      vertical-align: middle;
+      background: var(--yellow); color: var(--green-900);
+      border-radius: 14px; padding: 4px 26px; transform: rotate(-2deg);
+      box-shadow: 0 10px 28px rgba(244,196,48,.4);
+      min-width: 230px; height: 1.25em; line-height: 1.25em; margin: 0 8px;
+    }
+    .word-text {
+      display: inline-block;
+      font-family: var(--font-title); font-weight: 900; letter-spacing: 0.5px;
+      will-change: transform, opacity;
+    }
+
+    .statement-sub { text-align: center; max-width: 760px; margin: 0 auto 56px; font-size: 1.15rem; opacity: .88; line-height: 1.7; }
+    .benefit-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; max-width: 1200px; margin: 0 auto; }
+    .benefit {
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
+      border-radius: 24px; padding: 26px 22px;
+    }
+    .benefit .num { font-family: var(--font-title); font-size: 2.4rem; color: var(--yellow); line-height: 1; }
+    .benefit h3 { font-size: 1.12rem; margin: 10px 0 8px; }
+    .benefit p { font-size: .92rem; opacity: .82; line-height: 1.55; }
+    .benefit-cta { text-align: center; margin-top: 50px; }
+
+    /* ============ SECCIONES GENERALES ============ */
+    section.block { padding: 120px 6vw; position: relative; }
+    .section-head { max-width: 760px; margin: 0 auto 56px; text-align: center; }
+    .section-head h2 { font-size: clamp(2.4rem, 4.6vw, 4rem); line-height: 1.05; color: var(--green-800); margin: 14px 0 14px; letter-spacing: -0.5px; }
+    .section-head p { color: var(--muted); font-size: 1.12rem; line-height: 1.6; }
+
+    /* ============ INGREDIENTES: 6 PLANTAS EN CUADRÍCULA LIMPIA (SIN MODELO 3D) ============ */
+    .ingredients { background: #fff; position: relative; }
+    .ing-grid-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+    .ing-card {
+      background: var(--green-50); border: 1.5px solid var(--line); border-radius: 28px;
+      padding: 26px 24px; display: flex; gap: 20px; align-items: center;
+      transition: transform .35s var(--ease), box-shadow .35s, background .35s, border-color .35s;
+    }
+    .ing-card:hover { transform: translateY(-6px); box-shadow: 0 22px 44px rgba(6,106,56,.12); background: #fff; border-color: var(--green-300); }
+    .ing-card img { width: 96px; height: 96px; object-fit: contain; flex-shrink: 0; transition: transform .6s var(--ease); }
+    .ing-card:hover img { transform: rotate(-8deg) scale(1.08); }
+    .ing-card h3 { font-size: 1.28rem; color: var(--green-700); line-height: 1.2; margin-bottom: 6px; }
+    .ing-card h3 small { display: block; font-size: .68rem; letter-spacing: 1.2px; color: var(--orange); font-weight: 800; margin-bottom: 4px; }
+    .ing-card p { font-size: .88rem; color: var(--muted); line-height: 1.55; }
+
+    /* ============ SOBRE NOSOTROS ============ */
+    .about { background: var(--green-50); overflow: hidden; }
+    .about-grid { max-width: 1220px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 1fr; gap: 60px; align-items: center; }
+    .about h2 { font-size: clamp(2.4rem, 4.2vw, 3.8rem); color: var(--green-800); line-height: 1.05; margin: 14px 0 18px; letter-spacing: -0.5px; }
+    .about p { font-size: 1.08rem; color: #3c4b41; margin-bottom: 18px; line-height: 1.65; }
+    .about-stats { display: flex; gap: 34px; margin: 28px 0 34px; }
+    .about-stats div strong { display: block; font-family: var(--font-title); font-size: 2.4rem; color: var(--green-700); line-height: 1; }
+    .about-stats div span { font-size: .82rem; color: var(--muted); font-weight: 600; }
+    .about-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .about-reel-box {
+      display: flex; justify-content: center; align-items: center; width: 100%;
+    }
+    .reel-slider { position: relative; width: 100%; max-width: 420px; }
+    .reel-track {
+      display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+      border-radius: 28px; border: 1px solid var(--line); background: #fff;
+      box-shadow: 0 24px 60px rgba(11,61,36,.14); scrollbar-width: none;
+    }
+    .reel-track::-webkit-scrollbar { display: none; }
+    .reel-slide { flex: 0 0 100%; scroll-snap-align: center; }
+    .ig-reel-frame { display: block; width: 100%; height: 580px; border: 0; background: #fff; }
+    .reel-nav {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+      width: 48px; height: 48px; border-radius: 50%; border: 0; cursor: pointer;
+      background: var(--green-vibrant); color: #fff; font-size: 1.2rem; font-weight: 800;
+      box-shadow: 0 10px 24px rgba(0,165,81,.3); transition: background .25s, transform .25s;
+    }
+    .reel-nav:hover { background: var(--green-700); transform: translateY(-50%) scale(1.06); }
+    .reel-nav.prev { left: -24px; }
+    .reel-nav.next { right: -24px; }
+    .reel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+    .reel-dots span { width: 9px; height: 9px; border-radius: 99px; background: var(--green-300); transition: width .3s, background .3s; cursor: pointer; }
+    .reel-dots span.on { width: 26px; background: var(--green-vibrant); }
+
+    /* ============ COMUNIDAD & INSTAGRAM ============ */
+    .community { background: #fff; }
+    .comm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; max-width: 1240px; margin: 0 auto; }
+    .comm-card {
+      border-radius: 26px; overflow: hidden; border: 1px solid var(--line);
+      background: #fff; transition: transform .35s var(--ease), box-shadow .35s;
+      display: flex; flex-direction: column;
+    }
+    .comm-card:hover { transform: translateY(-8px); box-shadow: 0 24px 50px rgba(11,61,36,.12); }
+    .comm-thumb {
+      position: relative; height: 260px; overflow: hidden; background: var(--green-100);
+    }
+    .comm-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
+    .comm-card:hover .comm-thumb img { transform: scale(1.06); }
+    .comm-play {
+      position: absolute; inset: 0; display: grid; place-items: center;
+      background: rgba(0,0,0,.25); color: #fff; transition: background .2s;
+    }
+    .comm-card:hover .comm-play { background: rgba(0,0,0,.4); }
+    .comm-play span {
+      width: 52px; height: 52px; border-radius: 50%; background: #fff; color: var(--green-800);
+      display: grid; place-items: center; box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    }
+    .comm-tag {
+      position: absolute; top: 16px; left: 16px;
+      font-size: .72rem; letter-spacing: .6px; color: #fff; background: rgba(0,0,0,.65);
+      padding: 5px 12px; border-radius: 999px; backdrop-filter: blur(8px);
+    }
+    .comm-body { padding: 22px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .comm-body h4 { font-size: 1.15rem; color: var(--green-800); }
+    .comm-body p { font-size: .9rem; color: var(--muted); flex: 1; }
+    .comm-link { font-size: .88rem; font-weight: 800; color: var(--green-700); font-family: var(--font-title); margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; }
+
+    .comm-cta { text-align: center; margin-top: 50px; }
+    .btn-ig-official {
+      display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+      background: var(--green-vibrant); color: #fff;
+      font-family: var(--font-title); font-weight: 700; font-size: 1rem;
+      letter-spacing: 1.6px; text-transform: uppercase;
+      padding: 16px 38px; border-radius: 6px; text-decoration: none;
+      box-shadow: 0 10px 24px rgba(0,165,81,.28);
+      transition: transform .25s var(--ease), background .25s, box-shadow .25s;
+    }
+    .btn-ig-official:hover {
+      background: var(--green-dark); transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(0,165,81,.36);
+    }
+    .btn-ig-official .icon { font-size: 1.35rem; }
+
+    /* ============ PRODUCTOS: CARDS CON HOVER FLUIDO Y DEGRADADOS BOTÁNICOS ============ */
+    .products { background: var(--green-50); }
+    .prod-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; max-width: 1280px; margin: 0 auto; }
+    .prod-card {
+      position: relative; border-radius: 30px; overflow: hidden;
+      background: #ffffff;
+      border: 1.5px solid var(--line);
+      display: flex; flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0,0,0,.03);
+      transition: transform .45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .45s cubic-bezier(0.16, 1, 0.3, 1), border-color .45s ease;
+      isolation: isolate;
+    }
+    /* Pseudo-elemento para transición de fondo 100% suave tanto en entrada como en salida del mouse */
+    .prod-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity .45s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .prod-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 30px 65px rgba(11,61,36,.22);
+    }
+    .prod-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Card 200g - Fondo Esmeralda Rico en hover */
+    .prod-card.c-200::before {
+      background: linear-gradient(160deg, #0e6b3b 0%, #064022 100%);
+    }
+    .prod-card.c-200:hover {
+      border-color: #22C25E;
+    }
+
+    /* Card 60g - Fondo Verde Bosque Botánico (armonioso, sin tonos mostaza) */
+    .prod-card.c-60::before {
+      background: linear-gradient(160deg, #116238 0%, #083b1f 100%);
+    }
+    .prod-card.c-60:hover {
+      border-color: #34D399;
+    }
+
+    /* Card Combo x3 - Fondo Noche Botánica en hover */
+    .prod-card.c-combo::before {
+      background: linear-gradient(160deg, #0b4e2a 0%, #042413 100%);
+    }
+    .prod-card.c-combo:hover {
+      border-color: var(--yellow);
+    }
+
+    /* Contenidos internos sobre el fondo interactivo */
+    .prod-tag, .prod-3d, .prod-info {
+      position: relative;
+      z-index: 2;
+    }
+    .prod-tag {
+      position: absolute; top: 18px; left: 18px; z-index: 3;
+      background: var(--ink); color: #fff; font-size: .72rem; letter-spacing: .6px;
+      padding: 7px 14px; border-radius: 999px; font-family: var(--font-title);
+    }
+    .prod-tag.orange { background: var(--orange); }
+    .prod-tag.yellow { background: var(--yellow); color: var(--green-900); }
+    .prod-3d { position: relative; height: 420px; cursor: grab; }
+    .prod-3d:active { cursor: grabbing; }
+    .prod-3d canvas { display: block; width: 100% !important; height: 100% !important; }
+    .zoom-hint {
+      position: absolute; right: 16px; top: 18px; z-index: 3;
+      font-size: .72rem; font-weight: 700; padding: 6px 12px; border-radius: 999px;
+      background: rgba(255,255,255,.9); color: var(--ink); pointer-events: none;
+      transition: opacity .3s; font-family: var(--font-title);
+    }
+    .prod-3d.zoom-on .zoom-hint { opacity: 0; }
+    .prod-info { padding: 22px 26px 26px; display: flex; flex-direction: column; gap: 14px; }
+    .prod-info h3 {
+      font-size: 1.35rem; line-height: 1.2; letter-spacing: -0.3px; color: var(--ink);
+      transition: color .4s ease;
+    }
+    .prod-info .desc {
+      font-size: .92rem; opacity: .78; color: var(--muted);
+      transition: color .4s ease, opacity .4s ease;
+    }
+    .price-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .price {
+      font-size: 1.6rem; color: var(--ink); font-family: var(--font-title);
+      transition: color .4s ease;
+    }
+    .price del {
+      font-size: 1rem; font-weight: 600; opacity: .5; margin-right: 6px;
+      transition: color .4s ease;
+    }
+    .price small {
+      display: block; font-size: .76rem; font-weight: 700; opacity: .75; font-family: var(--font-body);
+      transition: color .4s ease;
+    }
+
+    /* Adaptación fluida de colores en hover para las 3 tarjetas */
+    .prod-card:hover .prod-info h3 { color: #ffffff; }
+    .prod-card:hover .prod-info .desc { color: rgba(255,255,255,.9); opacity: 1; }
+    .prod-card:hover .price { color: #ffffff; }
+    .prod-card:hover .price del { color: rgba(255,255,255,.6); }
+    .prod-card:hover .price small { color: rgba(255,255,255,.85); }
+
+    /* Botón PEDIR: Montserrat, MAYÚSCULAS, verde #00A551 */
+    .btn.btn-order { border: 0; }
+    .btn-order {
+      background: var(--green-vibrant);
+      color: #ffffff;
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: .88rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 12px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 16px rgba(0,165,81,.25);
+      transition: transform .25s var(--ease), background .35s, box-shadow .35s, color .35s;
+    }
+    .btn-order:hover {
+      transform: translateY(-2px);
+    }
+    .btn-order .icon { fill: currentColor; font-size: 1.1rem; }
+
+    /* Inversión limpia del botón PEDIR al hacer hover en la card */
+    .prod-card.c-200:hover .btn-order {
+      background: #ffffff;
+      color: #0f4d2e;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+    }
+    .prod-card.c-60:hover .btn-order {
+      background: #ffffff;
+      color: #083b1f;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+    }
+    .prod-card.c-combo:hover .btn-order {
+      background: var(--yellow);
+      color: var(--green-900);
+      box-shadow: 0 6px 20px rgba(0,0,0,.22);
+    }
+    .prod-card.c-combo:hover .price { color: var(--yellow); }
+
+    /* Tarjeta guía "¿Cuál elegir?" */
+    .prod-card.c-help { background: linear-gradient(165deg, var(--green-50) 0%, #ffffff 70%); }
+    .prod-card.c-help::before { background: linear-gradient(160deg, #0b4e2a 0%, #042413 100%); }
+    .prod-card.c-help:hover { border-color: var(--yellow); }
+    .prod-3d.help-3d { height: 270px; }
+    .help-body { position: relative; z-index: 2; flex: 1; padding: 6px 26px 0; }
+    .help-body h3 { font-size: 1.45rem; line-height: 1.15; color: var(--green-800); letter-spacing: -.4px; margin-bottom: 16px; transition: color .4s; }
+    .help-list { list-style: none; display: grid; gap: 12px; }
+    .help-list li { display: grid; grid-template-columns: 86px 1fr; gap: 14px; align-items: start; padding-bottom: 12px; border-bottom: 1.5px dashed rgba(6,106,56,.22); transition: border-color .4s; }
+    .help-list li:last-child { border-bottom: 0; }
+    .help-list b { font-family: var(--font-title); font-weight: 900; font-size: 1.05rem; color: var(--green-vibrant); background: #fff; border: 1.5px solid var(--green-300); border-radius: 999px; text-align: center; padding: 5px 0; transition: all .4s; }
+    .help-list span { font-size: .93rem; line-height: 1.5; color: var(--muted); transition: color .4s; }
+    .prod-card.c-help:hover .help-body h3 { color: #fff; }
+    .prod-card.c-help:hover .help-list span { color: rgba(255,255,255,.88); }
+    .prod-card.c-help:hover .help-list b { background: var(--yellow); border-color: var(--yellow); color: var(--green-900); }
+    .prod-card.c-help:hover .help-list li { border-color: rgba(255,255,255,.18); }
+    .prod-card.c-help:hover .btn-order { background: var(--yellow); color: var(--green-900); box-shadow: 0 6px 20px rgba(0,0,0,.22); }
+
+    /* Caja 3D viajera */
+    .box-dock { position: relative; }
+    .box-dock-a { min-height: 560px; }
+    .box-dock-b { flex: 0 0 150px; height: 300px; }
+    .reviews-head-left { max-width: 520px !important; }
+    .box-flyer {
+      position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none;
+      transform-origin: 0 0; will-change: transform; visibility: hidden;
+    }
+    .box-flyer canvas { display: block; width: 100% !important; height: 100% !important; }
+
+    .products-note { text-align: center; margin-top: 34px; color: var(--muted); font-size: .95rem; }
+
+    /* ============ TESTIMONIOS: EDITORIAL Y PROTAGONISTA (ESTILO GOOGLE REVIEWS) ============ */
+    .testimonials {
+      background: #fbf9f5; /* Tono cálido lino muy fino inspirado en la referencia editorial */
+      color: var(--ink);
+      overflow: hidden;
+      padding: 110px 6vw 120px;
+      position: relative;
+    }
+    .reviews-head-wrap {
+      max-width: 1280px;
+      margin: 0 auto 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+    .reviews-head-left { max-width: 720px; }
+    .reviews-head-left .eyebrow {
+      background: #ffffff;
+      color: var(--green-dark);
+      border: 1px solid #dbe6de;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+    .reviews-head-left h2 {
+      font-size: clamp(2.5rem, 5vw, 4.2rem);
+      line-height: 1.05;
+      letter-spacing: -0.5px;
+      color: var(--green-800);
+      text-transform: uppercase;
+      margin: 14px 0 10px;
+      font-weight: 900;
+    }
+    .reviews-head-left p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    .reviews-head-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Badge oficial de Google Reviews */
+    .google-official-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #ffffff;
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: 1.5px solid #e1ebe3;
+      box-shadow: 0 4px 16px rgba(0,0,0,.04);
+      font-family: var(--font-title);
+      font-size: .88rem;
+    }
+    .google-official-badge svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .google-official-badge strong { font-weight: 800; color: #1a73e8; }
+    .google-official-badge .badge-stars { color: #fbbc05; letter-spacing: 2px; font-size: 1.05rem; }
+
+    /* Flechas de navegación circular estilo Sippers Say */
+    .reviews-nav { display: flex; gap: 10px; }
+    .rev-arrow {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #ffffff; color: var(--green-800);
+      border: 1.5px solid #d4dfd7;
+      display: grid; place-items: center;
+      font-size: 1.35rem; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,.05);
+      transition: all .25s var(--ease);
+      user-select: none;
+    }
+    .rev-arrow:hover {
+      background: var(--green-vibrant);
+      color: #ffffff;
+      border-color: var(--green-vibrant);
+      transform: scale(1.06);
+      box-shadow: 0 6px 18px rgba(0,165,81,.25);
+    }
+
+    /* Track del slider con scroll-snap */
+    .reviews-slider-wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .reviews-slider {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      padding: 10px 4px 30px;
+      scrollbar-width: none;
+    }
+    .reviews-slider::-webkit-scrollbar { display: none; }
+
+    /* Tarjeta individual de Google Review */
+    .rev-card {
+      flex: 0 0 clamp(320px, 32vw, 390px);
+      scroll-snap-align: start;
+      background: #ffffff;
+      border: 1.5px solid #e2ebe4;
+      border-radius: 28px;
+      padding: 30px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 6px 24px rgba(11,61,36,.04);
+      transition: transform .35s var(--ease), box-shadow .35s, border-color .35s;
+      position: relative;
+    }
+    .rev-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 46px rgba(11,61,36,.12);
+      border-color: var(--green-vibrant);
+    }
+
+    /* Cabecera interna de la tarjeta */
+    .rev-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .rev-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .rev-avatar {
+      width: 46px; height: 46px; border-radius: 50%;
+      display: grid; place-items: center;
+      font-weight: 800; font-family: var(--font-title); font-size: 1.1rem;
+      color: #fff; flex-shrink: 0;
+    }
+    .rev-user-meta strong {
+      display: block; font-size: .98rem; font-family: var(--font-title); font-weight: 800; color: var(--ink);
+    }
+    .rev-user-meta .rev-date {
+      display: block; font-size: .78rem; color: var(--muted); font-family: var(--font-body);
+    }
+    .rev-google-icon { width: 22px; height: 22px; flex-shrink: 0; }
+
+    /* Fila de estrellas y verificado */
+    .rev-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rev-stars { color: #fbbc05; letter-spacing: 2px; font-size: 1.1rem; }
+    .rev-verified {
+      display: inline-flex; align-items: center; gap: 4px;
+      color: #1a73e8; font-size: .78rem; font-weight: 700; font-family: var(--font-title);
+    }
+    .rev-verified svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* Cita gráfica */
+    .rev-quote-icon {
+      font-family: var(--font-title);
+      font-size: 2.2rem;
+      line-height: 1;
+      color: var(--yellow);
+      margin-bottom: -10px;
+    }
+    .rev-text {
+      font-size: .98rem;
+      line-height: 1.65;
+      color: #2b3b31;
+      flex: 1;
+    }
+    .rev-link-more {
+      font-size: .84rem;
+      font-weight: 700;
+      color: var(--green-vibrant);
+      font-family: var(--font-title);
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: auto;
+    }
+    .rev-link-more:hover { color: var(--green-dark); }
+
+    .reviews-cta-wrap {
+      text-align: center;
+      margin-top: 36px;
+    }
+
+    /* ============ CONTACTO (FOTO DEL FRASCO 200G) ============ */
+    .contact { background: #fff; }
+    .contact-box {
+      max-width: 1180px; margin: 0 auto; background: #fff; border-radius: 36px;
+      box-shadow: 0 30px 70px rgba(11,61,36,.10); overflow: hidden;
+      display: grid; grid-template-columns: .9fr 1.1fr; border: 1px solid var(--line);
+    }
+    .contact-aside {
+      background: linear-gradient(170deg, var(--green-700), var(--green-900)); color: #fff;
+      padding: 50px 44px; position: relative; overflow: hidden;
+    }
+    .contact-aside h2 { font-size: 2.5rem; line-height: 1.1; margin: 16px 0; letter-spacing: -0.5px; }
+    .contact-aside p { opacity: .88; margin-bottom: 26px; line-height: 1.65; }
+    .contact-aside .eyebrow { background: rgba(255,255,255,.12); color: var(--yellow); }
+    .contact-list { list-style: none; display: grid; gap: 14px; position: relative; z-index: 2; }
+    .contact-list li { display: flex; gap: 12px; align-items: flex-start; font-size: .94rem; }
+    .contact-list .icon { font-size: 1.2rem; margin-top: 2px; color: var(--yellow); }
+    .contact-aside img.deco {
+      position: absolute; right: -25px; bottom: -25px;
+      width: 230px; height: auto;
+      filter: drop-shadow(0 16px 36px rgba(0,0,0,.4));
+      transform: rotate(-6deg);
+      opacity: .95; pointer-events: none;
+    }
+    .contact-form { padding: 50px 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 18px; align-content: start; }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: .76rem; letter-spacing: .8px; text-transform: uppercase; color: #46554b; font-family: var(--font-title); }
+    .input {
+      width: 100%; padding: 14px 16px; border-radius: 14px; border: 1.5px solid #d7e2da;
+      font-family: var(--font-body); font-size: .95rem; background: #fff; color: var(--ink);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .input:focus { outline: none; border-color: var(--green-vibrant); box-shadow: 0 0 0 4px rgba(0,165,81,.14); }
+    textarea.input { resize: vertical; min-height: 96px; }
+
+    /* Dropdown personalizado */
+    .nb-select { position: relative; }
+    .nb-select-btn {
+      width: 100%; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    }
+    .nb-select-btn .placeholder { color: #8a988f; }
+    .nb-select-btn svg { width: 16px; height: 16px; transition: transform .3s var(--ease); flex-shrink: 0; }
+    .nb-select.open .nb-select-btn { border-color: var(--green-vibrant); box-shadow: 0 0 0 4px rgba(0,165,81,.14); }
+    .nb-select.open .nb-select-btn svg { transform: rotate(180deg); }
+    .nb-options {
+      position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 20;
+      list-style: none; background: #fff; border-radius: 16px; padding: 8px;
+      box-shadow: 0 20px 44px rgba(11,61,36,.18); border: 1px solid var(--line);
+      opacity: 0; transform: translateY(-8px) scale(.98); pointer-events: none;
+      transition: opacity .25s, transform .3s var(--ease);
+      max-height: 280px; overflow-y: auto;
+    }
+    .nb-select.open .nb-options { opacity: 1; transform: none; pointer-events: auto; }
+    .nb-options li {
+      padding: 11px 14px; border-radius: 10px; cursor: pointer; font-size: .94rem;
+      display: flex; align-items: center; gap: 12px; transition: background .15s;
+    }
+    .nb-options li img { width: 36px; height: 36px; object-fit: contain; }
+    .nb-options li .opt-price { margin-left: auto; font-weight: 800; color: var(--green-vibrant); font-size: .86rem; font-family: var(--font-title); }
+    .nb-options li:hover, .nb-options li.focused { background: var(--green-100); }
+    .nb-options li.selected { background: var(--green-vibrant); color: #fff; }
+    .nb-options li.selected .opt-price { color: #fff; }
+
+    .check { display: flex; gap: 10px; align-items: flex-start; font-size: .88rem; color: var(--muted); cursor: pointer; }
+    .check input { accent-color: var(--green-vibrant); width: 18px; height: 18px; margin-top: 2px; }
+
+    /* Botón Formulario: Enviar solicitud por WhatsApp (robusto, prominente y moderno) */
+    .btn-wa-submit {
+      width: 100%;
+      padding: 18px 32px;
+      background: var(--green-vibrant);
+      color: #ffffff !important;
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 10px 28px rgba(0, 165, 81, .32);
+      transition: transform .25s var(--ease), background .25s, box-shadow .25s;
+    }
+    .btn-wa-submit:hover {
+      background: var(--green-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(15, 77, 46, .38);
+    }
+    .btn-wa-submit .icon {
+      width: 24px;
+      height: 24px;
+      fill: #ffffff !important;
+      font-size: 1.35rem;
+    }
+
+    /* ============ FOOTER ============ */
+    footer { background: var(--green-900); color: rgba(255,255,255,.75); padding: 70px 6vw 30px; }
+    .footer-grid { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; }
+    .footer-grid img { height: 52px; filter: none; margin-bottom: 18px; }
+    .footer-grid h4 { color: #fff; font-size: 1.15rem; letter-spacing: .5px; margin-bottom: 14px; }
+    .footer-grid ul { list-style: none; display: grid; gap: 8px; font-size: .92rem; }
+    .footer-grid a:hover { color: var(--yellow); }
+    .socials { display: flex; gap: 10px; margin-top: 18px; }
+    .socials a {
+      width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+      background: rgba(255,255,255,.1); color: #fff; transition: background .2s, transform .2s;
+    }
+    .socials a:hover { background: var(--green-vibrant); transform: translateY(-2px); }
+    .foot-invima { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 10px; }
+    .foot-invima img { height: 40px; width: auto; }
+    .foot-invima span { font-size: .8rem; line-height: 1.4; }
+    .footer-bottom {
+      max-width: 1240px; margin: 50px auto 0; padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,.12);
+      display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+      font-size: .82rem; opacity: .7;
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1024px) {
+      .hero-left { width: 44vw; }
+      .hero-right { width: 36vw; }
+      .ing-grid-cards { grid-template-columns: 1fr 1fr; }
+      .about-grid { grid-template-columns: 1fr; }
+      .comm-grid { grid-template-columns: 1fr; }
+      .prod-grid { grid-template-columns: 1fr; max-width: 480px; }
+      .review-track { grid-template-columns: 1fr; }
+      .contact-box { grid-template-columns: 1fr; }
+      .benefit-grid { grid-template-columns: 1fr 1fr; }
+      .fs-body { grid-template-columns: 1fr; }
+      .fs-products { display: none; }
+    }
+    @media (max-width: 768px) {
+      header { padding: 14px 20px; }
+      .header-actions .btn-header-wa { display: none; }
+      .hero-col { position: relative; top: auto; left: auto; right: auto; transform: none; width: 100%; text-align: center; }
+      .hero-right { display: none; }
+      .hero-left { padding: 80px 20px 20px; width: 100%; }
+      #hero-3d { width: 85vw; }
+      .ing-grid-cards { grid-template-columns: 1fr; }
+      .benefit-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+      .contact-form { grid-template-columns: 1fr; padding: 30px 24px; }
+      .statement { font-size: 2.1rem; }
+      .word-swap { min-width: 170px; padding: 4px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SVG Sprites oficiales -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-wa" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.06-1.07l-.29-.17-3.12.82.83-3.04-.19-.3a8.21 8.21 0 0 1-1.26-4.47c0-4.54 3.7-8.24 8.24-8.24m4.54 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.65.81-.8 1-.15.19-.3.2-.55.08-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.78 2.71 4.3 3.8.6.26 1.07.42 1.44.54.61.19 1.16.17 1.6.1.49-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.3"/>
+  </symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+  </symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+  </symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+  </symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+  </symbol>
+  <!-- Logo oficial de Google Reviews con 4 colores auténticos -->
+  <symbol id="i-google" viewBox="0 0 24 24">
+    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+  </symbol>
+  <!-- Insignia azul de reseña verificada -->
+  <symbol id="i-verified" viewBox="0 0 24 24">
+    <path fill="#1a73e8" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.2 14.6l-3.9-3.9 1.4-1.4 2.5 2.5 6.1-6.1 1.4 1.4-7.5 7.5z"/>
+  </symbol>
+</svg>
+
+<!-- ================= HEADER FLOTANTE CON BOTONES EN BLANCO Y BORDE VERDE ================= -->
+<header id="siteHeader" class="is-hero">
+  <a class="header-logo" href="#inicio" aria-label="Inicio NEBA Cosmetics">
+    <img class="logo-color" src="assets/logo-etiqueta.webp" alt="NEBA Cosmetics">
+    <img class="logo-white" src="assets/logo-white-clean.webp" alt="" aria-hidden="true">
+  </a>
+
+  <div class="header-actions">
+    <!-- Menú: Fondo blanco, MISMO borde #00A551, Montserrat 500 MAYÚSCULAS -->
+    <button class="menu-btn" id="openMenu" aria-label="Abrir menú de navegación">
+      <span>MENÚ</span>
+      <div class="bars"><span></span><span></span><span></span></div>
+    </button>
+  </div>
+</header>
+
+<!-- ================= MENÚ FULLSCREEN CON TIPOGRAFÍA MONTSERRAT ================= -->
+<div class="fs-menu" id="fsMenu" aria-hidden="true">
+  <img class="fs-menu-watermark" src="assets/logo-white-clean.webp" alt="" aria-hidden="true">
+
+  <div class="fs-top">
+    <img src="assets/logo-white-clean.webp" alt="NEBA Cosmetics">
+    <button class="close-btn" id="closeMenu" aria-label="Cerrar menú">✕ CERRAR</button>
+  </div>
+
+  <div class="fs-body">
+    <div class="fs-nav-wrap">
+      <nav class="fs-links">
+        <a class="fs-link" href="#beneficios"><small>01</small> Beneficios</a>
+        <a class="fs-link" href="#ingredientes"><small>02</small> Ingredientes</a>
+        <a class="fs-link" href="#nosotros"><small>03</small> Historia</a>
+        <a class="fs-link" href="#comprar"><small>04</small> Comprar</a>
+        <a class="fs-link" href="#testimonios"><small>05</small> Testimonios</a>
+        <a class="fs-link" href="#contacto"><small>06</small> Contacto</a>
+      </nav>
+      <!-- Botón SUBIDO para no quedar pegado al fondo -->
+      <div class="fs-buy">
+        <a class="btn btn-white" href="#comprar">Ver Presentaciones y Precios →</a>
+      </div>
+    </div>
+
+    <div class="fs-products">
+      <div class="fs-products-head">
+        <h4>Presentaciones Disponibles</h4>
+        <div class="fs-quick">
+          <a class="btn btn-white btn-sm" href="#comprar">Comprar</a>
+          <a class="btn btn-ghost-light btn-sm" href="https://api.whatsapp.com/send/?phone=573143068117&text=Hola%20NEBA%20Cosmetics%2C%20quisiera%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener"><svg class="icon"><use href="#i-wa"/></svg> 314 306 8117</a>
+        </div>
+      </div>
+      <a class="fs-prod" href="#comprar">
+        <img src="assets/frasco-200g.webp" alt="NEBA-10 200g">
+        <div><strong>NEBA-10 · 200 g</strong><span>$68.000 · Envío incluido</span></div>
+        <span class="arrow">→</span>
+      </a>
+      <a class="fs-prod" href="#comprar">
+        <img src="assets/frasco-60g.webp" alt="NEBA-10 60g">
+        <div><strong>NEBA-10 · 60 g</strong><span>$43.000 · Envío incluido</span></div>
+        <span class="arrow">→</span>
+      </a>
+      <a class="fs-prod" href="https://api.whatsapp.com/send/?phone=573143068117&text=Hola%20NEBA%2C%20quisiera%20consultar%20el%20precio%20al%20por%20mayor%20de%20NEBA-10.%20%C2%BFCu%C3%A1nto%20me%20quedan%20m%C3%ADnimo%206%20unidades%3F" target="_blank" rel="noopener">
+        <img src="assets/frasco-200g.webp" alt="NEBA-10 al por mayor">
+        <div><strong>Precio al por mayor</strong><span>Consulta desde 6 unidades por WhatsApp</span></div>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="fs-footer">
+    <span>info@nebacosmetics.com</span>
+    <span>WhatsApp 314 306 8117</span>
+    <span>Lun – Sáb · 08:00 am – 6:00 pm · Cartagena de Indias</span>
+  </div>
+</div>
+
+<!-- ================= HERO: VIDEO DE FONDO 100% VISIBLE ================= -->
+<section class="hero" id="inicio">
+  <div class="hero-stage">
+    <div class="hero-bg" id="heroBg">
+      <video id="heroBgVideo" class="hero-bg-video" autoplay muted loop playsinline preload="auto">
+        <source src="assets/fondovideo.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <div class="hero-tint" aria-hidden="true"></div>
+
+    <div class="hero-giant" aria-hidden="true">
+      <span>NEBA-10</span>
+      <span>ALIVIO</span>
+      <span>NATURAL</span>
+    </div>
+
+    <div class="hero-floor"></div>
+    <div id="hero-3d" title="Arrastra para girar el tubo en 360°"></div>
+
+    <!-- Columna izquierda: Título con GEL CORPORAL en una sola línea -->
+    <div class="hero-col hero-left">
+      <div class="slides" id="heroSlidesLeft">
+        <div class="slide">
+          <h1 class="hero-title">
+            <span class="hero-brand">NEBA-10,</span>
+            <span class="hero-sub">gel corporal.</span>
+          </h1>
+          <p class="hero-desc">Formulado con extractos botánicos puros de <strong>Cannabis Sativa, Árnica Montana, Romero, Eucalipto, Hierbabuena y Caléndula</strong>.</p>
+        </div>
+        <div class="slide slide-green">
+          <h2 class="hero-title">
+            <span class="hero-brand">Alivio</span>
+            <span class="hero-sub">profundo.</span>
+          </h2>
+          <p class="hero-desc">Refresca y revitaliza tus <strong>músculos y articulaciones</strong>. Una experiencia reconfortante para tu bienestar y descanso diario.</p>
+        </div>
+        <div class="slide">
+          <h2 class="hero-title">
+            <span class="hero-brand">Hecho en</span>
+            <span class="hero-sub">Colombia.</span>
+          </h2>
+          <p class="hero-desc">Elaborado con orgullo por <strong>Laboratorios VIM S.A.S.</strong> para NEBA Cosmetics, desde Cartagena de Indias con <strong>registro INVIMA</strong> oficial.</p>
+        </div>
+      </div>
+
+      <div class="progress">
+        <div class="progress-meta"><span>Presentación 200 g</span><span id="progressLabel">01 / 03</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </div>
+
+    <div class="scroll-hint"><span>Desliza</span><i></i></div>
+  </div>
+</section>
+
+<!-- ================= BENEFICIOS: PALABRA DINÁMICA PERFECTAMENTE CENTRADA ================= -->
+<section class="benefits" id="beneficios">
+  <svg class="scallop" viewBox="0 0 1200 64" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="#066A38" d="M0,64 Q37.5,-16 75,64 Q112.5,-16 150,64 Q187.5,-16 225,64 Q262.5,-16 300,64 Q337.5,-16 375,64 Q412.5,-16 450,64 Q487.5,-16 525,64 Q562.5,-16 600,64 Q637.5,-16 675,64 Q712.5,-16 750,64 Q787.5,-16 825,64 Q862.5,-16 900,64 Q937.5,-16 975,64 Q1012.5,-16 1050,64 Q1087.5,-16 1125,64 Q1162.5,-16 1200,64 Z"/>
+  </svg>
+  <div class="benefits-inner" id="benefitsInner">
+    <img class="benefits-leaf" src="assets/cannabis.webp" alt="" style="left:-80px;top:40px;transform:rotate(-20deg)">
+    <img class="benefits-leaf" src="assets/hierbabuena.webp" alt="" style="right:-90px;bottom:60px;transform:rotate(25deg)">
+
+    <h2 class="statement">
+      Profundamente refrescante, naturalmente
+      <span class="word-swap" id="wordSwap">
+        <span class="word-text" id="wordText">PURO</span>
+      </span>,
+      para tu belleza y bienestar.
+    </h2>
+    <p class="statement-sub">Revitaliza tu cuerpo con NEBA-10, un gel corporal botánico diseñado para acompañarte en tu recuperación y descanso diario.</p>
+
+    <div class="benefit-grid">
+      <div class="benefit reveal"><div class="num">01</div><h3>Antiinflamatorio</h3><p>Árnica, Romero y Cannabis apoyan la reducción de hinchazón, tensión y rigidez muscular.</p></div>
+      <div class="benefit reveal"><div class="num">02</div><h3>Alivio Articular</h3><p>Estimula el confort y descanso en articulaciones sobrecargadas por el trabajo o ejercicio.</p></div>
+      <div class="benefit reveal"><div class="num">03</div><h3>Efecto Refrescante</h3><p>Eucalipto y Hierbabuena proporcionan un agradable choque frío que despeja y revitaliza.</p></div>
+      <div class="benefit reveal"><div class="num">04</div><h3>Hidrata y Protege</h3><p>La Caléndula cuida la barrera cutánea manteniendo tu piel suave y humectada.</p></div>
+    </div>
+    <div class="benefit-cta"><a class="btn btn-white" href="#ingredientes">Conoce los ingredientes ↓</a></div>
+  </div>
+</section>
+
+<!-- ================= INGREDIENTES: ETIQUETA QUE SE DESPLAZA CON EL SCROLL ================= -->
+<style>
+  .etq-section {
+    --etq-green: #00A551;
+    --etq-green-dk: #066A38;
+    --etq-green-900: #0b3d24;
+    --etq-orange: #E8821E;
+    --etq-sky: #29ABE2;
+    --etq-ink: #17241b;
+    --etq-muted: #4e5e53;
+    --etq-paper: #fbfdf9;
+    --etq-bg: #f3f9f4;
+    --etq-title: 'Montserrat', system-ui, sans-serif;
+    --etq-body: 'Comfortaa', system-ui, sans-serif;
+    position: relative;
+    background: var(--etq-bg);
+    padding: 120px 6vw 140px;
+  }
+  .etq-wrap {
+    max-width: 1240px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1.05fr; gap: 6vw; align-items: start;
+  }
+
+  /* ---------- Columna izquierda: fija mientras se hace scroll ---------- */
+  .etq-sticky { position: sticky; top: max(96px, calc(50vh - 330px)); }
+  .etq-eyebrow {
+    font-family: var(--etq-title); font-weight: 800; font-size: .78rem; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--etq-orange);
+  }
+  .etq-sticky h2 {
+    font-family: var(--etq-title); font-weight: 900; color: var(--etq-green-dk);
+    font-size: clamp(2.2rem, 3.5vw, 3.3rem); line-height: 1.02; letter-spacing: -1px; margin: 12px 0 14px;
+  }
+  .etq-sticky h2 em { font-style: normal; color: var(--etq-green); }
+  .etq-sticky > p { color: var(--etq-muted); font-size: 1.05rem; line-height: 1.65; max-width: 440px; }
+  .etq-sticky > p strong { color: var(--etq-green-dk); }
+  .etq-3d { width: 46%; height: 330px; flex-shrink: 0; position: relative; }
+  .etq-3d canvas { display: block; width: 100% !important; height: 100% !important; }
+  .etq-3d::after { /* sombra en el piso */
+    content: ""; position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%);
+    width: 60%; height: 22px; border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(11,61,36,.22) 0%, rgba(11,61,36,0) 70%);
+    pointer-events: none;
+  }
+
+  .etq-stage { position: relative; margin-top: 26px; display: flex; align-items: center; gap: 22px; }
+  .etq-tube {
+    width: min(300px, 46%); flex-shrink: 0;
+    filter: drop-shadow(0 26px 30px rgba(11,61,36,.22));
+    transform: rotate(calc(-14deg + var(--etq-p, 0) * 22deg)) translateY(calc(var(--etq-p, 0) * -10px));
+    transition: transform .25s linear;
+  }
+  .etq-now { min-width: 0; }
+  .etq-now small { display: block; font-family: var(--etq-title); font-weight: 800; font-size: .7rem; letter-spacing: 1.6px; color: var(--etq-muted); text-transform: uppercase; }
+  .etq-now strong {
+    display: block; font-family: var(--etq-title); font-weight: 900; color: var(--etq-green-dk);
+    font-size: 1.5rem; line-height: 1.15; margin: 4px 0 12px; min-height: 2.3em;
+    transition: opacity .25s;
+  }
+  .etq-dots { display: grid; grid-template-columns: repeat(6, 38px); gap: 6px; }
+  .etq-dots img {
+    width: 38px; height: 38px; object-fit: contain; border-radius: 50%; background: #fff;
+    padding: 3px; border: 2px solid transparent; opacity: .35; filter: grayscale(1);
+    transition: opacity .3s, filter .3s, border-color .3s, transform .3s;
+  }
+  .etq-dots img.on { opacity: 1; filter: none; border-color: var(--etq-green); transform: scale(1.08); }
+  .etq-dots img.done { opacity: .9; filter: none; }
+
+  .etq-cta {
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 28px;
+    background: var(--etq-green); color: #fff; text-decoration: none;
+    font-family: var(--etq-title); font-weight: 800; letter-spacing: .6px; text-transform: uppercase; font-size: .9rem;
+    padding: 15px 28px; border-radius: 999px; box-shadow: 0 10px 24px rgba(0,165,81,.28);
+    transition: transform .25s, background .25s;
+  }
+  .etq-cta:hover { transform: translateY(-3px); background: var(--etq-green-dk); }
+  .etq-actions { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .etq-actions .etq-cta { margin-top: 0; }
+  .etq-invima { display: flex; align-items: center; gap: 12px; padding-left: 22px; border-left: 1.5px solid rgba(6,106,56,.2); }
+  .etq-invima img { height: 34px; width: auto; }
+  .etq-invima span { font-family: var(--etq-title); font-size: .68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--etq-muted); line-height: 1.3; }
+  .etq-invima strong { display: block; font-size: .85rem; letter-spacing: .3px; color: var(--etq-green-dk); }
+  .etq-foot .etq-invima-logo { height: 30px; width: auto; margin: 22px auto 4px; display: block; }
+
+  /* ---------- Columna derecha: la "etiqueta" larga ---------- */
+  .etq-label {
+    position: relative; background: var(--etq-paper); color: var(--etq-green-dk);
+    padding: 70px clamp(24px, 4vw, 62px) 60px;
+    box-shadow: 0 30px 60px rgba(11,61,36,.10);
+    /* textura de papel muy suave */
+    background-image:
+      radial-gradient(rgba(0,165,81,.05) 1px, transparent 1.2px),
+      radial-gradient(rgba(0,165,81,.035) 1px, transparent 1.2px);
+    background-size: 14px 14px, 22px 22px;
+    background-position: 0 0, 7px 11px;
+  }
+  /* Borde superior: sello estriado del tubo */
+  .etq-label::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -30px; height: 30px;
+    background:
+      repeating-linear-gradient(90deg, #e6efe8 0 3px, #fbfdf9 3px 7px);
+    border-top: 2px solid #dbe7de;
+  }
+  /* Borde inferior: corte en zigzag (como la factura) */
+  .etq-label::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -22px; height: 22px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='22'%3E%3Cpolygon points='0,0 30,0 15,22' fill='%23fbfdf9'/%3E%3C/svg%3E") 0 0 / 30px 22px repeat-x;
+    filter: drop-shadow(0 10px 8px rgba(11,61,36,.06));
+  }
+
+  .etq-head { text-align: center; position: relative; }
+  .etq-head img { width: 190px; margin: 0 auto 6px; display: block; }
+  .etq-head h3 { font-family: var(--etq-title); font-weight: 900; font-size: 1.6rem; color: var(--etq-green-dk); letter-spacing: -.3px; }
+  .etq-head p { font-size: .98rem; color: var(--etq-green-dk); line-height: 1.6; max-width: 520px; margin: 10px auto 0; }
+  .etq-head p strong { color: var(--etq-green); }
+
+  .etq-cut { border: 0; border-top: 2px dashed rgba(6,106,56,.45); margin: 38px 0; }
+
+  .etq-item { display: grid; grid-template-columns: 1fr 96px; gap: 18px; align-items: start; }
+  .etq-item .etq-n { font-family: var(--etq-title); font-weight: 800; font-size: .74rem; letter-spacing: 1.8px; color: var(--etq-orange); text-transform: uppercase; }
+  .etq-item h4 { font-family: var(--etq-title); font-weight: 900; font-size: clamp(1.6rem, 2.6vw, 2.1rem); color: var(--etq-green-dk); line-height: 1.05; margin: 4px 0 4px; letter-spacing: -.5px; }
+  .etq-item h4 i { display: block; font-style: italic; font-family: var(--etq-body); font-weight: 500; font-size: .85rem; color: var(--etq-muted); letter-spacing: 0; margin-top: 4px; }
+  .etq-item p { font-size: .98rem; line-height: 1.7; color: #2f4436; margin-top: 12px; }
+  .etq-item img { width: 96px; height: 96px; object-fit: contain; transition: transform .8s cubic-bezier(.16,1,.3,1); }
+  .etq-item.is-in img { transform: rotate(-8deg); }
+
+  .etq-block h5 { font-family: var(--etq-title); font-weight: 900; font-size: .95rem; letter-spacing: 1.6px; color: var(--etq-orange); text-transform: uppercase; text-align: center; margin-bottom: 10px; }
+  .etq-block p { font-style: italic; font-size: .93rem; line-height: 1.65; color: var(--etq-green-dk); text-align: justify; }
+  .etq-block + .etq-block { margin-top: 26px; }
+
+  .etq-foot { text-align: center; font-family: var(--etq-title); color: var(--etq-green-dk); }
+  .etq-foot .etq-row { display: flex; justify-content: center; gap: 34px; font-weight: 600; font-size: .9rem; color: var(--etq-muted); font-variant-numeric: tabular-nums; }
+  .etq-foot .etq-reg { margin-top: 18px; font-size: .8rem; letter-spacing: 1.4px; font-weight: 800; color: var(--etq-orange); text-transform: uppercase; }
+  .etq-foot .etq-val { font-weight: 800; font-size: .95rem; margin-top: 2px; }
+  .etq-foot .etq-thanks { margin: 22px 0 6px; color: var(--etq-muted); font-family: var(--etq-body); font-size: .95rem; }
+  .etq-barcode { display: block; width: 100%; height: 74px; margin: 18px 0 6px; }
+  .etq-code { font-size: .78rem; letter-spacing: 6px; color: var(--etq-ink); }
+  .etq-weight { font-weight: 900; font-style: italic; font-size: 1.5rem; margin-top: 14px; color: var(--etq-green-dk); }
+
+  /* Animación de entrada mientras se hace scroll */
+  .etq-anim { opacity: 0; transform: translateY(34px); transition: opacity .7s ease, transform .9s cubic-bezier(.16,1,.3,1); }
+  .etq-anim.is-in { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .etq-section { padding: 80px 16px 100px; }
+    .etq-wrap { grid-template-columns: 1fr; gap: 60px; }
+    .etq-sticky { position: relative; top: 0; }
+    .etq-3d { width: 42%; height: 260px; }
+    .etq-dots { grid-template-columns: repeat(3, 38px); }
+    .etq-item { grid-template-columns: 1fr 72px; }
+    .etq-item img { width: 72px; height: 72px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .etq-anim { opacity: 1; transform: none; transition: none; }
+    .etq-tube { transform: none; }
+  }
+</style>
+
+<section class="etq-section" id="ingredientes">
+  <div class="etq-wrap">
+
+    <!-- IZQUIERDA (fija) -->
+    <div class="etq-sticky">
+      <span class="etq-eyebrow">Ingredientes NEBA-10</span>
+      <h2>6 plantas,<br><em>una sola fórmula.</em></h2>
+      <p>Combina ingredientes naturales de <strong>Cannabis Sativa, Árnica Montana, Romero, Caléndula, Hierbabuena y Eucalipto</strong> que brindan una sensación de bienestar y frescura sobre la piel.</p>
+
+      <div class="etq-stage">
+        <div class="etq-3d" id="etq3d" aria-label="Tubo NEBA-10 en 3D"></div>
+        <div class="etq-now">
+          <small id="etqNowLabel">Leyendo la etiqueta</small>
+          <strong id="etqNowName">NEBA-10 Gel Corporal</strong>
+          <div class="etq-dots" id="etqDots">
+            <img src="assets/cannabis.webp" alt="Cannabis Sativa">
+            <img src="assets/arnica.webp" alt="Árnica Montana">
+            <img src="assets/romero.webp" alt="Romero">
+            <img src="assets/calendula.webp" alt="Caléndula">
+            <img src="assets/eucalipto.webp" alt="Eucalipto">
+            <img src="assets/hierbabuena.webp" alt="Hierbabuena">
+          </div>
+        </div>
+      </div>
+
+      <div class="etq-actions">
+        <a class="etq-cta" href="#comprar">Lo quiero →</a>
+      </div>
+    </div>
+
+    <!-- DERECHA (la etiqueta que se desplaza) -->
+    <article class="etq-label" id="etqLabel">
+      <div class="etq-head etq-anim">
+        <img src="assets/logo-etiqueta.webp" alt="NEBA Cosmetics">
+        <h3>Gel Corporal NEBA-10</h3>
+      </div>
+
+      <hr class="etq-cut">
+      <div class="etq-item etq-anim" data-etq="0">
+        <div>
+          <span class="etq-n">01 · Sin THC · Analgésico</span>
+          <h4>Cannabis Sativa<i>Cannabis Sativa Oil Seed</i></h4>
+          <p>Cicatrizante y tonificante. Estimula la microcirculación y favorece la flexibilidad muscular y la elasticidad dérmica.</p>
+        </div>
+        <img src="assets/cannabis.webp" alt="">
+      </div>
+
+      <hr class="etq-cut">
+      <div class="etq-item etq-anim" data-etq="1">
+        <div>
+          <span class="etq-n">02 · Calmante · Antiinflamatorio</span>
+          <h4>Árnica Montana<i>Arnica Montana Flower Extract</i></h4>
+          <p>El aliado clásico contra golpes, esguinces y dolores articulares. Reduce la sensación de pesadez e inflamación.</p>
+        </div>
+        <img src="assets/arnica.webp" alt="">
+      </div>
+
+      <hr class="etq-cut">
+      <div class="etq-item etq-anim" data-etq="2">
+        <div>
+          <span class="etq-n">03 · Antioxidante · Estimulante</span>
+          <h4>Romero<i>Rosmarinus Officinalis Leaf Extract</i></h4>
+          <p>Rico en ácido rosmarínico. Protege los tejidos frente al estrés oxidativo y estimula el flujo sanguíneo local.</p>
+        </div>
+        <img src="assets/romero.webp" alt="">
+      </div>
+
+      <hr class="etq-cut">
+      <div class="etq-item etq-anim" data-etq="3">
+        <div>
+          <span class="etq-n">04 · Regenerador · Hidratante</span>
+          <h4>Caléndula<i>Calendula Officinalis Flower Extract</i></h4>
+          <p>Suaviza e hidrata en profundidad la piel seca. Estimula la renovación celular con una suavidad dérmica insuperable.</p>
+        </div>
+        <img src="assets/calendula.webp" alt="">
+      </div>
+
+      <hr class="etq-cut">
+      <div class="etq-item etq-anim" data-etq="4">
+        <div>
+          <span class="etq-n">05 · Descongestionante · Frescura</span>
+          <h4>Eucalipto<i>Eucalyptus Globulus Leaf Extract</i></h4>
+          <p>Aporta un efecto balsámico inmediato. Su aroma natural da una sensación refrescante y despeja los sentidos.</p>
+        </div>
+        <img src="assets/eucalipto.webp" alt="">
+      </div>
+
+      <hr class="etq-cut">
+      <div class="etq-item etq-anim" data-etq="5">
+        <div>
+          <span class="etq-n">06 · Energizante · Efecto frío</span>
+          <h4>Hierbabuena<i>Mentha Spicata Leaf Extract</i></h4>
+          <p>Produce una sensación fría tonificante instantánea, reactivando las piernas cansadas y aliviando la fatiga.</p>
+        </div>
+        <img src="assets/hierbabuena.webp" alt="">
+      </div>
+
+      <hr class="etq-cut">
+      <div class="etq-block etq-anim">
+        <h5>Modo de empleo</h5>
+        <p>Aplicar una cantidad generosa del gel sobre la piel hasta que se absorba completamente.</p>
+      </div>
+      <div class="etq-block etq-anim">
+        <h5>Precauciones</h5>
+        <p>Sólo para uso externo, evitar el contacto con los ojos y otras mucosas, mantener fuera del alcance de los niños. Si observa alguna reacción desfavorable suspenda su uso, almacenar en un lugar fresco y seco.</p>
+      </div>
+
+      <hr class="etq-cut">
+      <div class="etq-foot etq-anim">
+        <div class="etq-row"><span id="etqDate">--/--/----</span><span id="etqTime">--:--</span></div>
+        <img class="etq-invima-logo" src="assets/invima.png" alt="INVIMA">
+        <div class="etq-reg" style="margin-top:4px">Registro sanitario</div>
+        <div class="etq-val">NSOC25244-23CO</div>
+        <div class="etq-reg">Elaborado por</div>
+        <div class="etq-val">LABORATORIOS VIM S.A.S.</div>
+        <div class="etq-reg">Para</div>
+        <div class="etq-val">NEBADON COSMETICS S.A.S.<br>Cartagena de Indias, Colombia</div>
+        <div class="etq-thanks">——— Gracias por cuidarte al natural ———</div>
+        <svg class="etq-barcode" id="etqBarcode" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="etq-code">CI:219014_8901_519</div>
+        <div class="etq-weight">200g</div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<script>
+(function () {
+  var section = document.getElementById('ingredientes');
+  if (!section) return;
+  var names = ['Cannabis Sativa', 'Árnica Montana', 'Romero', 'Caléndula', 'Eucalipto', 'Hierbabuena'];
+  var dots = section.querySelectorAll('#etqDots img');
+  var nowName = document.getElementById('etqNowName');
+  var nowLabel = document.getElementById('etqNowLabel');
+  var label = document.getElementById('etqLabel');
+
+  // 1) Aparición de cada bloque de la etiqueta al entrar en pantalla
+  var anim = section.querySelectorAll('.etq-anim');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+    }, { threshold: 0.18 });
+    anim.forEach(function (el) { io.observe(el); });
+  } else { anim.forEach(function (el) { el.classList.add('is-in'); }); }
+
+  // 2) Ingrediente "activo" (el que cruza el centro de la pantalla) + giro del tubo
+  var items = section.querySelectorAll('.etq-item');
+  var current = -2;
+  function setActive(i) {
+    if (i === current) return;
+    current = i;
+    window.dispatchEvent(new CustomEvent('etq:active', { detail: i }));
+    dots.forEach(function (d, k) { d.classList.toggle('on', k === i); d.classList.toggle('done', i >= 0 && k < i || i === 6); });
+    if (i >= 0 && i < 6) { nowLabel.textContent = 'Ingrediente ' + (i + 1) + ' de 6'; nowName.textContent = names[i]; }
+    else if (i === 6) { nowLabel.textContent = 'Etiqueta completa'; nowName.textContent = '6 plantas · 200 g'; }
+    else { nowLabel.textContent = 'Leyendo la etiqueta'; nowName.textContent = 'NEBA-10 Gel Corporal'; }
+  }
+  var ticking = false;
+  function onScroll() {
+    ticking = false;
+    var mid = window.innerHeight * 0.5, active = -1;
+    items.forEach(function (it, k) { if (it.getBoundingClientRect().top < mid) active = k; });
+    var last = items[items.length - 1].getBoundingClientRect();
+    if (last.bottom < mid * 0.6) active = 6;
+    setActive(active);
+    var r = label.getBoundingClientRect();
+    var p = Math.min(1, Math.max(0, (window.innerHeight - r.top) / (r.height + window.innerHeight)));
+    section.style.setProperty('--etq-p', p.toFixed(3));
+  }
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+
+  // 3) Fecha y hora "de impresión" como en la factura
+  var d = new Date(), pad = function (n) { return String(n).padStart(2, '0'); };
+  document.getElementById('etqDate').textContent = pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear();
+  document.getElementById('etqTime').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+
+  // 4) Código de barras decorativo (generado a partir del texto CI)
+  var svg = document.getElementById('etqBarcode');
+  var seed = 'NEBA10-219014-8901-519', x = 0, bars = '';
+  for (var k = 0; k < 64; k++) {
+    var c = seed.charCodeAt(k % seed.length) + k * 7;
+    var w = 1 + (c % 3), gap = 1 + ((c >> 2) % 3);
+    bars += '<rect x="' + x + '" y="0" width="' + w + '" height="60" fill="#17241b"/>';
+    x += w + gap;
+  }
+  svg.setAttribute('viewBox', '0 0 ' + x + ' 60');
+  svg.innerHTML = bars;
+})();
+</script>
+
+
+<!-- ================= SOBRE NOSOTROS: HISTORIA & REEL DE INSTAGRAM ================= -->
+<section class="block about" id="nosotros">
+  <div class="about-grid">
+    <div class="reveal">
+      <span class="eyebrow">Sobre Nosotros</span>
+      <h2 style="color:#00A551">Conoce nuestra historia</h2>
+      <p>Descubre la historia detrás de <strong>NEBA COSMETICS</strong> y la creación de nuestro revolucionario <strong>NEBA-10 GEL CORPORAL</strong>.</p>
+      <p>En estos videos te contamos cómo nuestra marca transformó el cuidado de la piel con innovación, pasión e ingredientes de máxima pureza. ¡No te los pierdas!</p>
+      <div class="about-stats">
+        <div><strong>6</strong><span>Plantas botánicas</span></div>
+        <div><strong>100%</strong><span>Hecho en Colombia</span></div>
+        <div><strong>2</strong><span>Presentaciones</span></div>
+      </div>
+      <div class="about-actions">
+        <a class="btn btn-green" href="https://www.instagram.com/nebacosmetics/" target="_blank" rel="noopener">Síguenos en Instagram <svg class="icon"><use href="#i-ig"/></svg></a>
+      </div>
+    </div>
+
+    <!-- Slider con los 3 reels de Instagram -->
+    <div class="about-reel-box reveal">
+      <div class="reel-slider">
+        <button class="reel-nav prev" id="reelPrev" aria-label="Video anterior">←</button>
+        <div class="reel-track" id="reelTrack">
+        <div class="reel-slide"><iframe class="ig-reel-frame" title="Historia de NEBA-10" src="https://www.instagram.com/reel/C5hXVfpMr31/embed/" scrolling="no" allowtransparency="true" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe></div>
+        <div class="reel-slide"><iframe class="ig-reel-frame" title="Reel NEBA-10" src="https://www.instagram.com/reel/Db3bXBsti5V/embed/" scrolling="no" allowtransparency="true" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe></div>
+        <div class="reel-slide"><iframe class="ig-reel-frame" title="Reel NEBA-10" src="https://www.instagram.com/reel/DLvTPzryEcv/embed/" scrolling="no" allowtransparency="true" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe></div>
+        </div>
+        <button class="reel-nav next" id="reelNext" aria-label="Video siguiente">→</button>
+        <div class="reel-dots" id="reelDots"><span class="on"></span><span></span><span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRESENTACIONES Y PRECIOS: CARDS BLANCAS LIMPIAS ================= -->
+<section class="block products" id="comprar">
+  <div class="section-head reveal">
+    <span class="eyebrow">Comprar</span>
+    <h2>Elige tu presentación</h2>
+    <p>Haz clic y arrastra cada modelo 3D para rotarlo en 360°.</p>
+  </div>
+
+  <div class="prod-grid">
+    <!-- Tarjeta 200g -->
+    <article class="prod-card c-200">
+      <span class="prod-tag orange">MÁS VENDIDO</span>
+      <div class="prod-3d" id="card3d-200"><span class="zoom-hint">Clic para zoom</span></div>
+      <div class="prod-info">
+        <h3>Gel Corporal NEBA-10 · 200 g</h3>
+        <p class="desc">El tamaño ideal para uso diario en casa. Rendimiento prolongado para toda la familia.</p>
+        <div class="price-row">
+          <div class="price"><del>$78.000</del>$68.000<small>Envío incluido</small></div>
+          <a class="btn btn-order" target="_blank" rel="noopener"
+             href="https://api.whatsapp.com/send/?phone=573143068117&text=Hola%20NEBA%2C%20quiero%20pedir%20el%20Gel%20Corporal%20NEBA-10%20200g%20(%2468.000)">
+            <svg class="icon"><use href="#i-wa"/></svg> PEDIR
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- Tarjeta 60g: BLANCA, LIMPIA, SIN FONDOS EXTRAÑOS -->
+    <article class="prod-card c-60">
+      <div class="prod-3d" id="card3d-60"><span class="zoom-hint">Clic para zoom</span></div>
+      <div class="prod-info">
+        <h3>Gel Corporal NEBA-10 · 60 g</h3>
+        <p class="desc">Llévalo siempre en tu bolso, maletín del gimnasio o equipaje de mano.</p>
+        <div class="price-row">
+          <div class="price">$43.000<small>Envío incluido</small></div>
+          <a class="btn btn-order" target="_blank" rel="noopener"
+             href="https://api.whatsapp.com/send/?phone=573143068117&text=Hola%20NEBA%2C%20quiero%20pedir%20el%20Gel%20Corporal%20NEBA-10%2060g%20(%2443.000)">
+            <svg class="icon"><use href="#i-wa"/></svg> PEDIR
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- Caja NEBA-10 (sin tarjeta): el modelo 3D flota aquí y viaja con el scroll hasta las reseñas -->
+    <div class="box-dock box-dock-a" id="boxDockA" aria-hidden="true"></div>
+  </div>
+  <p class="products-note">✓ Envío incluido a toda Colombia &nbsp;·&nbsp; ✓ Atención personalizada por WhatsApp </p>
+</section>
+
+<!-- ================= TESTIMONIOS: EDITORIAL Y PROTAGONISTA (GOOGLE REVIEWS) ================= -->
+<section class="block testimonials" id="testimonios">
+  <div class="reviews-head-wrap reveal">
+    <div class="reviews-head-left">
+      <span class="eyebrow">
+        <svg class="rev-google-icon"><use href="#i-google"/></svg>
+        Reseñas Verificadas en Google
+      </span>
+      <h2>Lo que dicen de NEBA</h2>
+      <p>Cientos de clientes en Colombia han recuperado su bienestar, descanso y movilidad gracias a la fórmula botánica de NEBA-10.</p>
+    </div>
+
+    <div class="box-dock box-dock-b" id="boxDockB" aria-hidden="true"></div>
+
+    <div class="reviews-head-right">
+      <div class="google-official-badge">
+        <svg class="rev-google-icon"><use href="#i-google"/></svg>
+        <div>
+          <strong>Google Reviews</strong>
+          <div><span class="badge-stars">★★★★★</span> <span style="font-weight:700;color:var(--ink)">4.9 / 5.0</span></div>
+        </div>
+      </div>
+      <!-- Botones de flechas circulares inspiradas en la referencia -->
+      <div class="reviews-nav">
+        <button id="revPrev" class="rev-arrow" aria-label="Reseña anterior">←</button>
+        <button id="revNext" class="rev-arrow" aria-label="Reseña siguiente">→</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-slider-wrap reveal">
+    <div class="reviews-slider" id="reviewsSlider">
+      <!-- Review 1: Debbye Camelo -->
+      <article class="rev-card">
+        <div class="rev-top">
+          <div class="rev-user">
+            <div class="rev-avatar" style="background: linear-gradient(135deg, #105934, #00A551)">D</div>
+            <div class="rev-user-meta">
+              <strong>Debbye Camelo</strong>
+              <span class="rev-date">2024-08-31</span>
+            </div>
+          </div>
+          <svg class="rev-google-icon"><use href="#i-google"/></svg>
+        </div>
+        <div class="rev-rating">
+          <div class="rev-stars">★★★★★</div>
+          <span class="rev-verified"><svg><use href="#i-verified"/></svg> Verificado</span>
+        </div>
+        <div class="rev-quote-icon">“</div>
+        <p class="rev-text">Excelente producto NEBA 10 para los dolores articulares y sobretodo para personas que sufren de Artrosis, tengo familiares que lo usan y les ha servido bastante.</p>
+        <a class="rev-link-more" target="_blank" rel="noopener" href="https://www.google.com/search?q=NEBA+Cosmetics+Cartagena+rese%C3%B1as">Leer más en Google ↗</a>
+      </article>
+
+      <!-- Review 2: Sandra Agamez -->
+      <article class="rev-card">
+        <div class="rev-top">
+          <div class="rev-user">
+            <div class="rev-avatar" style="background: #E8821E">S</div>
+            <div class="rev-user-meta">
+              <strong>Sandra Agamez</strong>
+              <span class="rev-date">2024-08-31</span>
+            </div>
+          </div>
+          <svg class="rev-google-icon"><use href="#i-google"/></svg>
+        </div>
+        <div class="rev-rating">
+          <div class="rev-stars">★★★★★</div>
+          <span class="rev-verified"><svg><use href="#i-verified"/></svg> Verificado</span>
+        </div>
+        <div class="rev-quote-icon">“</div>
+        <p class="rev-text">Neba ha sido un gel que ha cambiado mi vida y la de mi familia, nos ha ayudado con migraña, dolores musculares y articulares. Lo súper recomiendo.</p>
+        <a class="rev-link-more" target="_blank" rel="noopener" href="https://www.google.com/search?q=NEBA+Cosmetics+Cartagena+rese%C3%B1as">Leer más en Google ↗</a>
+      </article>
+
+      <!-- Review 3: AMELIA REGINA -->
+      <article class="rev-card">
+        <div class="rev-top">
+          <div class="rev-user">
+            <div class="rev-avatar" style="background: #0f4d2e">A</div>
+            <div class="rev-user-meta">
+              <strong>AMELIA REGINA</strong>
+              <span class="rev-date">2024-08-30</span>
+            </div>
+          </div>
+          <svg class="rev-google-icon"><use href="#i-google"/></svg>
+        </div>
+        <div class="rev-rating">
+          <div class="rev-stars">★★★★★</div>
+          <span class="rev-verified"><svg><use href="#i-verified"/></svg> Verificado</span>
+        </div>
+        <div class="rev-quote-icon">“</div>
+        <p class="rev-text">Excelente producto, súper recomendado por los excelentes resultados que nos brinda a mi madre y a mí para el dolor y la inflamación.</p>
+        <a class="rev-link-more" target="_blank" rel="noopener" href="https://www.google.com/search?q=NEBA+Cosmetics+Cartagena+rese%C3%B1as">Leer más en Google ↗</a>
+      </article>
+
+      <!-- Review 4: Stefanny Mendez -->
+      <article class="rev-card">
+        <div class="rev-top">
+          <div class="rev-user">
+            <div class="rev-avatar" style="background: #2563eb">S</div>
+            <div class="rev-user-meta">
+              <strong>Stefanny Mendez</strong>
+              <span class="rev-date">2024-09-04</span>
+            </div>
+          </div>
+          <svg class="rev-google-icon"><use href="#i-google"/></svg>
+        </div>
+        <div class="rev-rating">
+          <div class="rev-stars">★★★★★</div>
+          <span class="rev-verified"><svg><use href="#i-verified"/></svg> Verificado</span>
+        </div>
+        <div class="rev-quote-icon">“</div>
+        <p class="rev-text">Excelente producto... Efectivo y lo mejor, natural... Alivio rápido y reconfortante desde la primera aplicación en zonas de tensión.</p>
+        <a class="rev-link-more" target="_blank" rel="noopener" href="https://www.google.com/search?q=NEBA+Cosmetics+Cartagena+rese%C3%B1as">Leer más en Google ↗</a>
+      </article>
+
+      <!-- Review 5: Marolin Gutierrez -->
+      <article class="rev-card">
+        <div class="rev-top">
+          <div class="rev-user">
+            <div class="rev-avatar" style="background: #be185d">M</div>
+            <div class="rev-user-meta">
+              <strong>Marolin Gutierrez</strong>
+              <span class="rev-date">2024-09-03</span>
+            </div>
+          </div>
+          <svg class="rev-google-icon"><use href="#i-google"/></svg>
+        </div>
+        <div class="rev-rating">
+          <div class="rev-stars">★★★★★</div>
+          <span class="rev-verified"><svg><use href="#i-verified"/></svg> Verificado</span>
+        </div>
+        <div class="rev-quote-icon">“</div>
+        <p class="rev-text">Un excelente producto, sufro mucho de cólicos, me aplique el Neba 10 y me alivio mucho el dolor, lo recomiendo 100%.</p>
+        <a class="rev-link-more" target="_blank" rel="noopener" href="https://www.google.com/search?q=NEBA+Cosmetics+Cartagena+rese%C3%B1as">Leer más en Google ↗</a>
+      </article>
+
+      <!-- Review 6: Vanessa Coavas -->
+      <article class="rev-card">
+        <div class="rev-top">
+          <div class="rev-user">
+            <div class="rev-avatar" style="background: #7c3aed">V</div>
+            <div class="rev-user-meta">
+              <strong>Vanessa Coavas</strong>
+              <span class="rev-date">2024-09-03</span>
+            </div>
+          </div>
+          <svg class="rev-google-icon"><use href="#i-google"/></svg>
+        </div>
+        <div class="rev-rating">
+          <div class="rev-stars">★★★★★</div>
+          <span class="rev-verified"><svg><use href="#i-verified"/></svg> Verificado</span>
+        </div>
+        <div class="rev-quote-icon">“</div>
+        <p class="rev-text">Excelente producto, super recomendado para dolores y descanso muscular. Calidad comprobada y envío rápido.</p>
+        <a class="rev-link-more" target="_blank" rel="noopener" href="https://www.google.com/search?q=NEBA+Cosmetics+Cartagena+rese%C3%B1as">Leer más en Google ↗</a>
+      </article>
+    </div>
+  </div>
+
+  <div class="reviews-cta-wrap reveal">
+    <a class="btn btn-white" target="_blank" rel="noopener" href="https://www.google.com/search?q=NEBA+Cosmetics+Cartagena+rese%C3%B1as">
+      <svg class="rev-google-icon" style="margin-right:6px"><use href="#i-google"/></svg>
+      Ver todas las reseñas en Google (5.0 ★) ↗
+    </a>
+  </div>
+</section>
+
+<!-- ================= CONTACTO (FOTO DEL FRASCO 200G) ================= -->
+<section class="block contact" id="contacto">
+  <div class="contact-box reveal">
+    <aside class="contact-aside">
+      <h2>¿Estás interesado en comprar NEBA-10?</h2>
+      <p>Déjanos tus datos y te contactaremos de inmediato por WhatsApp para coordinar tu envío a cualquier rincón de Colombia.</p>
+      <ul class="contact-list">
+        <li><svg class="icon"><use href="#i-pin"/></svg><span>Edificio Minerva, Tv. 71c #31i 37, Los Alpes, Cartagena de Indias, Colombia</span></li>
+        <li><svg class="icon"><use href="#i-clock"/></svg><span>Lunes a Sábado · 08:00 am – 6:00 pm</span></li>
+        <li><svg class="icon"><use href="#i-wa"/></svg><span>+57 314 306 8117</span></li>
+        <li><svg class="icon"><use href="#i-mail"/></svg><span>info@nebacosmetics.com</span></li>
+      </ul>
+      <img class="deco" src="assets/frasco-200g.webp" alt="Gel Corporal NEBA-10 200g">
+    </aside>
+
+    <form class="contact-form" id="waForm" novalidate>
+      <div class="field">
+        <label for="fName">Nombre y apellido(s)</label>
+        <input class="input" id="fName" type="text" placeholder="Tu nombre completo" required>
+      </div>
+      <div class="field">
+        <label for="fEmail">Correo electrónico</label>
+        <input class="input" id="fEmail" type="email" placeholder="correo@ejemplo.com">
+      </div>
+
+      <div class="field full">
+        <label>¿Qué presentación deseas?</label>
+        <div class="nb-select" data-name="producto">
+          <button type="button" class="input nb-select-btn">
+            <span class="placeholder">Selecciona una presentación...</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <ul class="nb-options">
+            <li data-value="Gel Corporal NEBA-10 · 200 g ($68.000)">
+              <img src="assets/frasco-200g.webp" alt="">
+              <div><strong>NEBA-10 · 200 g</strong><div style="font-size:.78rem;opacity:.7">Tamaño estándar</div></div>
+              <span class="opt-price">$68.000</span>
+            </li>
+            <li data-value="Gel Corporal NEBA-10 · 60 g ($43.000)">
+              <img src="assets/frasco-60g.webp" alt="">
+              <div><strong>NEBA-10 · 60 g</strong><div style="font-size:.78rem;opacity:.7">Formato de viaje</div></div>
+              <span class="opt-price">$43.000</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>¿Cómo nos conociste?</label>
+        <div class="nb-select" data-name="origen">
+          <button type="button" class="input nb-select-btn">
+            <span class="placeholder">Selecciona una opción...</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <ul class="nb-options">
+            <li data-value="Instagram / Redes Sociales">Instagram / Redes Sociales</li>
+            <li data-value="Recomendación de un amigo o familiar">Recomendación de amigo o familiar</li>
+            <li data-value="Búsqueda en Google">Búsqueda en Google</li>
+            <li data-value="Recomendación de profesional de la salud">Recomendación médica / fisioterapia</li>
+            <li data-value="Ya soy cliente de NEBA">Ya soy cliente de NEBA</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label for="fMsg">¿Alguna duda o requerimiento especial?</label>
+        <textarea class="input" id="fMsg" placeholder="Escribe aquí tu ciudad o cualquier consulta sobre el producto..."></textarea>
+      </div>
+
+      <div class="field full">
+        <label class="check">
+          <input type="checkbox" id="fPolicy" required checked>
+          <span>Acepto la política de tratamiento de datos personales para recibir asesoría por WhatsApp.</span>
+        </label>
+      </div>
+
+      <div class="field full">
+        <button class="btn-wa-submit" type="submit">
+          <svg class="icon"><use href="#i-wa"/></svg>
+          <span>Enviar solicitud por WhatsApp</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <img src="assets/logo-white-clean.webp" alt="NEBA Cosmetics" style="height:56px;width:auto;object-fit:contain;margin-bottom:18px;">
+      <p style="font-size:.92rem;line-height:1.6;margin-bottom:14px">Cosmética botánica de alto rendimiento para el bienestar, alivio muscular y vitalidad diaria de tu piel.</p>
+      <div class="socials">
+        <a href="https://www.instagram.com/nebacosmetics/" target="_blank" rel="noopener" aria-label="Instagram"><svg class="icon"><use href="#i-ig"/></svg></a>
+        <a href="https://api.whatsapp.com/send/?phone=573143068117" target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="icon"><use href="#i-wa"/></svg></a>
+      </div>
+    </div>
+
+    <div>
+      <h4>Navegación</h4>
+      <ul>
+        <li><a href="#beneficios">Beneficios</a></li>
+        <li><a href="#ingredientes">Ingredientes</a></li>
+        <li><a href="#nosotros">Nuestra Historia</a></li>
+        <li><a href="#testimonios">Testimonios</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4>Productos</h4>
+      <ul>
+        <li><a href="#comprar">NEBA-10 200 g</a></li>
+        <li><a href="#comprar">NEBA-10 60 g</a></li>
+        <li><a href="#contacto">Ventas corporativas</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4>Contacto</h4>
+      <ul>
+        <li>WhatsApp: 314 306 8117</li>
+        <li>info@nebacosmetics.com</li>
+        <li>Cartagena de Indias, Colombia</li>
+        <li class="foot-invima"><img src="assets/invima-blanco.png" alt="INVIMA"><span>Registro sanitario NSOC25244-23CO</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 NEBA Cosmetics. Todos los derechos reservados.</span>
+    <span>Formulado por Laboratorios VIM S.A.S. para NEBA Cosmetics.</span>
+  </div>
+</footer>
+
+<!-- ================= SCRIPTS ================= -->
+<script>
+(function () {
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ---------------- Header y menú ---------------- */
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
+
+  const fsMenu = document.getElementById('fsMenu');
+  const openMenu = () => { fsMenu.classList.add('open'); fsMenu.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; };
+  const closeMenu = () => { fsMenu.classList.remove('open'); fsMenu.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; };
+  const openBtn = document.getElementById('openMenu');
+  const closeBtn = document.getElementById('closeMenu');
+  if (openBtn) openBtn.addEventListener('click', openMenu);
+  if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+  fsMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+  /* ---------------- Reproducción directa y visible del video de fondo del Hero ---------------- */
+  const hVid = document.getElementById('heroBgVideo');
+  if (hVid) {
+    hVid.muted = true;
+    hVid.defaultMuted = true;
+    const playPromise = hVid.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        ['click', 'touchstart', 'scroll'].forEach(evt => {
+          window.addEventListener(evt, () => hVid.play(), { once: true });
+        });
+      });
+    }
+  }
+
+  /* ---------------- Utilidades Three.js ---------------- */
+  function b64ToBuffer(b64) {
+    const bin = atob(b64), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes.buffer;
+  }
+
+  function studioEnv(renderer) {
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const s = new THREE.Scene();
+    s.add(new THREE.Mesh(new THREE.SphereGeometry(5, 32, 16), new THREE.MeshBasicMaterial({ color: 0x9e9e98, side: THREE.BackSide })));
+    const panel = (w, h, x, y, z, v) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(v, v, v), side: THREE.DoubleSide }));
+      m.position.set(x, y, z); m.lookAt(0, 0, 0); s.add(m);
+    };
+    panel(3, 4, -3, 2, 3, 2.9); panel(2.5, 3, 3.5, 1, 2, 1.8); panel(4, 1.5, 0, 4, -2, 2.2);
+    return pmrem.fromScene(s, 0.04).texture;
+  }
+
+  function makeRenderer(el, maxDpr) {
+    const r = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    r.setPixelRatio(Math.min(window.devicePixelRatio, maxDpr));
+    r.outputEncoding = THREE.sRGBEncoding;
+    r.toneMapping = THREE.ACESFilmicToneMapping;
+    r.toneMappingExposure = 0.98;
+    r.physicallyCorrectLights = true;
+    r.setClearColor(0x000000, 0);
+    r.setSize(el.clientWidth, el.clientHeight);
+    el.appendChild(r.domElement);
+    return r;
+  }
+
+  function addLights(scene) {
+    const key = new THREE.DirectionalLight(0xffffff, 1.45); key.position.set(-2, 3, 3); scene.add(key);
+    const rim = new THREE.DirectionalLight(0xffffff, 0.9); rim.position.set(1.5, 2.5, -3); scene.add(rim);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xe3eee5, 0.35));
+  }
+
+  let baseModel = null; const waiting = [];
+  function withModel(cb) { baseModel ? cb(baseModel.clone(true)) : waiting.push(cb); }
+  new THREE.GLTFLoader().parse(b64ToBuffer(window.NEBA10_GLB_B64), '', gltf => {
+    const m = gltf.scene;
+    m.traverse(o => {
+      if (o.isMesh && o.material) {
+        o.material.envMapIntensity = 0.70;
+        if (o.material.map) o.material.map.anisotropy = 16;
+        if (/Etiqueta/i.test(o.material.name)) o.material.roughness = Math.max(o.material.roughness, 0.38);
+      }
+    });
+    const box = new THREE.Box3().setFromObject(m);
+    const size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
+    const s = 1 / size.y;
+    m.scale.setScalar(s); m.position.set(-c.x * s, -c.y * s, -c.z * s);
+    baseModel = new THREE.Group(); baseModel.add(m);
+    waiting.splice(0).forEach(cb => cb(baseModel.clone(true)));
+  }, err => console.error('Modelo 3D:', err));
+
+  /* ---------------- HERO: TUBO CON ANIMACIÓN Y SALIDA DINÁMICA ---------------- */
+  const heroEl = document.getElementById('hero-3d');
+  const heroR = makeRenderer(heroEl, 2);
+  const heroScene = new THREE.Scene();
+  heroScene.environment = studioEnv(heroR);
+  addLights(heroScene);
+  const heroCam = new THREE.PerspectiveCamera(26, heroEl.clientWidth / heroEl.clientHeight, 0.01, 20);
+  heroCam.position.set(0, 0.02, 3.0);
+  const heroCtl = new THREE.OrbitControls(heroCam, heroR.domElement);
+  Object.assign(heroCtl, { enableDamping: true, dampingFactor: 0.08, enableZoom: false, enablePan: false, minPolarAngle: Math.PI * 0.3, maxPolarAngle: Math.PI * 0.7 });
+
+  const heroPivot = new THREE.Group(); heroScene.add(heroPivot);
+  withModel(m => heroPivot.add(m));
+
+  let scrollRot = 0, tilt = 0, heroExitRotX = 0, heroExitY = 0, heroExitScale = 1;
+  const t0 = performance.now();
+  let heroVisible = true;
+  new IntersectionObserver(e => { heroVisible = e[0].isIntersecting; }).observe(heroEl);
+  (function loopHero() {
+    requestAnimationFrame(loopHero);
+    if (!heroVisible) return;
+    const t = (performance.now() - t0) / 1000;
+    heroPivot.rotation.y += (scrollRot - heroPivot.rotation.y) * 0.08;
+    heroPivot.rotation.z += (tilt - heroPivot.rotation.z) * 0.08;
+    heroPivot.rotation.x += (heroExitRotX - heroPivot.rotation.x) * 0.08;
+    heroPivot.position.y = Math.sin(t * 1.2) * 0.015 + heroExitY;
+    const curScale = heroPivot.scale.x + (heroExitScale - heroPivot.scale.x) * 0.08;
+    heroPivot.scale.setScalar(curScale);
+
+    heroCtl.update();
+    heroR.render(heroScene, heroCam);
+  })();
+
+  const leftSlides = gsap.utils.toArray('.hero-left .slide');
+  const giant = gsap.utils.toArray('.hero-giant span');
+  const progressLabel = document.getElementById('progressLabel');
+
+  const heroStage = document.querySelector('.hero-stage');
+  const heroTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.hero', start: 'top top', end: 'bottom 200%', scrub: 0.8, /* termina justo cuando entra Beneficios */
+      onUpdate: self => {
+        const p = self.progress;
+        const green = p > 0.33 && p < 0.66;
+        heroStage.classList.toggle('on-green', green);
+        header.classList.toggle('on-green', green);
+        scrollRot = p * Math.PI * 4.8;
+        tilt = Math.sin(p * Math.PI * 2) * 0.12;
+
+        if (progressLabel) {
+          if (p < 0.35) {
+            progressLabel.textContent = '01 / 03';
+          } else if (p < 0.68) {
+            progressLabel.textContent = '02 / 03';
+          } else {
+            progressLabel.textContent = '03 / 03';
+          }
+        }
+
+        // (la salida del tubo ahora va ligada a la entrada de la sección verde, ver abajo)
+      }
+    }
+  });
+
+  // Salida del tubo HACIA ARRIBA mientras la sección verde sube por encima del hero
+  const heroFloor = document.querySelector('.hero-floor');
+  ScrollTrigger.create({
+    trigger: '#beneficios', start: 'top 55%',
+    onEnter: () => header.classList.remove('is-hero'),
+    onLeaveBack: () => header.classList.add('is-hero')
+  });
+  ScrollTrigger.create({
+    trigger: '#beneficios', start: 'top bottom', end: 'top top',
+    onUpdate: self => {
+      const e = self.progress;
+      heroExitY = e * 0.55;
+      heroExitRotX = -e * 0.25;
+      heroExitScale = 1 - e * 0.1;
+      if (heroFloor) heroFloor.style.opacity = String(1 - e);
+    }
+  });
+
+  // Duración total de 6.0 unidades para distribuir exactamente un tercio por cada slide
+  heroTl.to('.hero-tint', { opacity: 1, duration: 0.5, ease: 'power1.inOut' }, 1.8)
+        .to('.hero-tint', { opacity: 0, duration: 0.5, ease: 'power1.inOut' }, 3.8);
+  heroTl.to('#progressFill', { scaleX: 1, ease: 'none', duration: 6 }, 0)
+        .to('#heroBg', { scale: 1.08, ease: 'none', duration: 6 }, 0);
+
+  // Transición 1 -> 2 (Slide 1: 0 a 1.8 | Transición: 1.8 a 2.3 | Slide 2: 2.3 a 3.8)
+  heroTl.to(leftSlides[0], { autoAlpha: 0, y: -35, filter: 'blur(5px)', duration: 0.45, ease: 'power2.in' }, 1.8)
+        .fromTo(leftSlides[1], { autoAlpha: 0, y: 35, filter: 'blur(5px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power2.out' }, 2.2)
+        .to(giant[0], { opacity: 0, scale: 0.94, duration: 0.5 }, 1.8)
+        .fromTo(giant[1], { opacity: 0, scale: 1.06 }, { opacity: 0.07, scale: 1, duration: 0.5 }, 2.15);
+
+  // Transición 2 -> 3 (Transición: 3.8 a 4.3 | Slide 3 "HECHO EN COLOMBIA": 4.3 a 6.0, tiempo de sobra para leerlo completo)
+  heroTl.to(leftSlides[1], { autoAlpha: 0, y: -35, filter: 'blur(5px)', duration: 0.45, ease: 'power2.in' }, 3.8)
+        .fromTo(leftSlides[2], { autoAlpha: 0, y: 35, filter: 'blur(5px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power2.out' }, 4.2)
+        .to(giant[1], { opacity: 0, scale: 0.94, duration: 0.5 }, 3.8)
+        .fromTo(giant[2], { opacity: 0, scale: 1.06 }, { opacity: 0.07, scale: 1, duration: 0.5 }, 4.15);
+
+  /* ---------------- BENEFICIOS: PALABRA DINÁMICA PERFECTAMENTE CENTRADA Y SUAVE ---------------- */
+  gsap.from('#benefitsInner .statement', {
+    y: 70, opacity: 0, duration: 1, ease: 'power3.out',
+    scrollTrigger: { trigger: '#beneficios', start: 'top 70%' }
+  });
+
+  /* Palabras dinámicas: eliminamos repetición redundante y aplicamos transición suave y cinematográfica */
+  const words = ['PURO', 'EFECTIVO', 'HERBAL', 'CALMANTE'];
+  const wordText = document.getElementById('wordText');
+  let currentWordIdx = 0;
+  let isUpdatingWord = false;
+
+  function updateWord(newIdx) {
+    if (newIdx === currentWordIdx || !wordText || isUpdatingWord) return;
+    currentWordIdx = newIdx;
+    isUpdatingWord = true;
+    gsap.killTweensOf(wordText);
+    gsap.to(wordText, {
+      opacity: 0,
+      y: -6,
+      filter: 'blur(4px)',
+      duration: 0.35,
+      ease: 'power2.out',
+      onComplete: () => {
+        wordText.textContent = words[newIdx];
+        gsap.fromTo(wordText,
+          { y: 6, opacity: 0, filter: 'blur(4px)' },
+          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.45, ease: 'power2.out', onComplete: () => { isUpdatingWord = false; } }
+        );
+      }
+    });
+  }
+
+  ScrollTrigger.create({
+    trigger: '#beneficios',
+    start: 'top 60%',
+    end: 'bottom 40%',
+    onUpdate: self => {
+      const idx = Math.min(words.length - 1, Math.floor(self.progress * words.length));
+      updateWord(idx);
+    }
+  });
+
+  /* ---------------- CARDS 3D EN PRESENTACIONES: GIRO 360° EN HOVER ---------------- */
+  function initCard(id, opts) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const r = makeRenderer(el, 1.5);
+    const scene = new THREE.Scene();
+    scene.environment = studioEnv(r);
+    addLights(scene);
+    const cam = new THREE.PerspectiveCamera(26, el.clientWidth / el.clientHeight, 0.01, 20);
+    cam.position.set(0, 0.04, opts.dist);
+    const ctl = new THREE.OrbitControls(cam, r.domElement);
+    // Sin autoRotate continuo: gira únicamente cuando el usuario hace hover en la card
+    Object.assign(ctl, { enableDamping: true, dampingFactor: 0.08, enablePan: false, enableZoom: false,
+      autoRotate: false, minDistance: opts.dist * 0.45, maxDistance: opts.dist * 1.3 });
+
+    el.addEventListener('pointerdown', () => { ctl.enableZoom = true; el.classList.add('zoom-on'); });
+    el.addEventListener('pointerleave', () => { ctl.enableZoom = false; el.classList.remove('zoom-on'); });
+    el.addEventListener('dblclick', () => { cam.position.set(0, 0.04, opts.dist); ctl.target.set(0, 0, 0); });
+
+    const cardGroup = new THREE.Group();
+    scene.add(cardGroup);
+
+    withModel(m => {
+      if (opts.count === 3) {
+        [-0.36, 0, 0.36].forEach((x, i) => {
+          const c = i === 1 ? m : m.clone(true);
+          c.position.x = x; c.position.z = i === 1 ? 0.12 : -0.05;
+          c.rotation.y = (i - 1) * -0.45;
+          cardGroup.add(c);
+        });
+      } else {
+        m.scale.multiplyScalar(opts.scale || 1);
+        cardGroup.add(m);
+      }
+    });
+
+    // Giro suave de 360° (vuelta completa) al hacer hover sobre la tarjeta
+    const parentCard = el.closest('.prod-card');
+    if (parentCard) {
+      parentCard.addEventListener('mouseenter', () => {
+        gsap.to(cardGroup.rotation, {
+          y: cardGroup.rotation.y + Math.PI * 2,
+          duration: 1.15,
+          ease: 'power2.inOut',
+          overwrite: 'auto'
+        });
+      });
+    }
+
+    let visible = false;
+    new IntersectionObserver(e => { visible = e[0].isIntersecting; }).observe(el);
+    (function loop() {
+      requestAnimationFrame(loop);
+      if (!visible) return;
+      ctl.update();
+      r.render(scene, cam);
+    })();
+    window.addEventListener('resize', () => {
+      cam.aspect = el.clientWidth / el.clientHeight; cam.updateProjectionMatrix();
+      r.setSize(el.clientWidth, el.clientHeight);
+    });
+  }
+  initCard('card3d-200', { dist: 2.8, scale: 1 });
+  initCard('card3d-60', { dist: 2.8, scale: 0.78 });
+
+  /* Caja NEBA-10: aparece en "Elige tu presentación" y viaja con el scroll hasta las reseñas de Google */
+  (function initBoxFlyer() {
+    const A = document.getElementById('boxDockA'), B = document.getElementById('boxDockB');
+    if (!A || !B || !window.NEBA10_CAJA_GLB_B64) return;
+    const fly = document.createElement('div');
+    fly.className = 'box-flyer';
+    document.body.appendChild(fly);
+    let W = 0, H = 0;
+    const sizeToA = () => { W = A.clientWidth; H = A.clientHeight; fly.style.width = W + 'px'; fly.style.height = H + 'px'; };
+    sizeToA();
+    const r = makeRenderer(fly, 1.5);
+    const scene = new THREE.Scene();
+    scene.environment = studioEnv(r);
+    addLights(scene);
+    const cam = new THREE.PerspectiveCamera(26, W / H, 0.01, 20);
+    cam.position.set(0, 0.04, 2.45);
+    const group = new THREE.Group(); scene.add(group);
+    new THREE.GLTFLoader().parse(b64ToBuffer(window.NEBA10_CAJA_GLB_B64), '', gltf => {
+      const m = gltf.scene;
+      m.traverse(o => { if (o.isMesh && o.material) { o.material.envMapIntensity = 0.75; if (o.material.map) o.material.map.anisotropy = 16; } });
+      const b = new THREE.Box3().setFromObject(m), size = b.getSize(new THREE.Vector3()), c = b.getCenter(new THREE.Vector3());
+      const k = 1 / size.y; m.scale.setScalar(k); m.position.set(-c.x * k, -c.y * k, -c.z * k);
+      group.add(m);
+    }, err => console.error('Caja 3D:', err));
+
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    const t0 = performance.now();
+    let rotY = -0.55;
+    (function loop() {
+      requestAnimationFrame(loop);
+      const ra = A.getBoundingClientRect(), rb = B.getBoundingClientRect(), vh = window.innerHeight;
+      // progreso: 0 cuando el centro de A está en el centro de la pantalla, 1 cuando lo está el centro de B
+      const ca = ra.top + ra.height / 2, cb = rb.top + rb.height / 2;
+      const p = Math.min(1, Math.max(0, (vh / 2 - ca) / (cb - ca)));
+      const e = ease(p);
+      const s = lerp(1, rb.height / H, e);
+      const cx = lerp(ra.left + ra.width / 2, rb.left + rb.width / 2, e);
+      const cy = lerp(ca, cb, p);                 // durante el viaje se queda en el centro de la pantalla
+      const x = cx - (W * s) / 2, y = cy - (H * s) / 2;
+      const onScreen = y < vh && y + H * s > 0;
+      fly.style.visibility = onScreen ? 'visible' : 'hidden';
+      if (!onScreen) return;
+      fly.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+      const t = (performance.now() - t0) / 1000;
+      const targetY = -0.55 + e * Math.PI * 2 + Math.sin(t * 0.7) * 0.15;  // una vuelta completa durante el viaje
+      rotY += (targetY - rotY) * 0.08;
+      group.rotation.y = rotY;
+      group.rotation.z = Math.sin(p * Math.PI) * 0.18;
+      group.position.y = Math.sin(t * 1.2) * 0.012;
+      r.render(scene, cam);
+    })();
+    window.addEventListener('resize', () => { sizeToA(); cam.aspect = W / H; cam.updateProjectionMatrix(); r.setSize(W, H); });
+  })();
+
+  /* ---------------- INGREDIENTES: TUBO 3D QUE GIRA CON EL SCROLL ---------------- */
+  (function initEtq3D() {
+    const el = document.getElementById('etq3d');
+    if (!el) return;
+    const r = makeRenderer(el, 2);
+    const scene = new THREE.Scene();
+    scene.environment = studioEnv(r);
+    addLights(scene);
+    const cam = new THREE.PerspectiveCamera(26, el.clientWidth / el.clientHeight, 0.01, 20);
+    cam.position.set(0, 0.02, 2.75);
+    const pivot = new THREE.Group(); scene.add(pivot);
+    withModel(m => pivot.add(m));
+
+    let spin = 0, pop = 0, done = false;
+    // Cada vez que cambia el ingrediente activo: medio giro extra y un pequeño "salto"
+    window.addEventListener('etq:active', e => {
+      // Al terminar de leer la etiqueta: una vuelta completa (solo una vez por pasada)
+      if (e.detail === 6 && !done) { spin += Math.PI * 2; pop = 1; done = true; }
+      if (e.detail < 5) done = false;
+    });
+
+    let visible = false;
+    new IntersectionObserver(e => { visible = e[0].isIntersecting; }).observe(el);
+    const t0 = performance.now();
+    (function loop() {
+      requestAnimationFrame(loop);
+      if (!visible) return;
+      const t = (performance.now() - t0) / 1000;
+      const targetY = spin + Math.sin(t * 0.6) * 0.18;   /* quieto, con un leve vaivén */
+      pivot.rotation.y += (targetY - pivot.rotation.y) * 0.06;
+      pivot.rotation.z += ((-0.12) - pivot.rotation.z) * 0.06;
+      pop *= 0.92;
+      pivot.position.y = Math.sin(t * 1.3) * 0.02 + pop * 0.06;
+      pivot.scale.setScalar(1 + pop * 0.05);
+      r.render(scene, cam);
+    })();
+    window.addEventListener('resize', () => {
+      cam.aspect = el.clientWidth / el.clientHeight; cam.updateProjectionMatrix();
+      r.setSize(el.clientWidth, el.clientHeight);
+    });
+  })();
+
+  /* ---------------- Reveals genéricos ---------------- */
+  ScrollTrigger.batch('.reveal', {
+    start: 'top 88%',
+    onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, duration: 0.85, stagger: 0.1, ease: 'power3.out', overwrite: true })
+  });
+
+  /* ---------------- Slider de reels (Sobre nosotros) ---------------- */
+  const reelTrack = document.getElementById('reelTrack');
+  if (reelTrack) {
+    const dots = [...document.querySelectorAll('#reelDots span')];
+    const go = i => reelTrack.scrollTo({ left: i * reelTrack.clientWidth });
+    const idx = () => Math.round(reelTrack.scrollLeft / reelTrack.clientWidth);
+    document.getElementById('reelPrev').addEventListener('click', () => go((idx() - 1 + dots.length) % dots.length));
+    document.getElementById('reelNext').addEventListener('click', () => go((idx() + 1) % dots.length));
+    dots.forEach((d, i) => d.addEventListener('click', () => go(i)));
+    reelTrack.addEventListener('scroll', () => { const k = idx(); dots.forEach((d, i) => d.classList.toggle('on', i === k)); }, { passive: true });
+  }
+
+  /* ---------------- Controles del Slider de Google Reviews ---------------- */
+  const revSlider = document.getElementById('reviewsSlider');
+  const revPrev = document.getElementById('revPrev');
+  const revNext = document.getElementById('revNext');
+  if (revSlider && revPrev && revNext) {
+    revPrev.addEventListener('click', () => {
+      revSlider.scrollBy({ left: -390, behavior: 'smooth' });
+    });
+    revNext.addEventListener('click', () => {
+      revSlider.scrollBy({ left: 390, behavior: 'smooth' });
+    });
+  }
+
+  /* ---------------- Dropdown personalizado ---------------- */
+  document.querySelectorAll('.nb-select').forEach(sel => {
+    const btn = sel.querySelector('.nb-select-btn');
+    const label = btn.querySelector('span');
+    const opts = [...sel.querySelectorAll('li')];
+    let focus = -1;
+    const close = () => { sel.classList.remove('open'); focus = -1; opts.forEach(o => o.classList.remove('focused')); };
+    const choose = li => {
+      opts.forEach(o => o.classList.remove('selected'));
+      li.classList.add('selected');
+      sel.dataset.value = li.dataset.value;
+      label.textContent = li.dataset.value;
+      label.classList.remove('placeholder');
+      close();
+    };
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      document.querySelectorAll('.nb-select.open').forEach(s => s !== sel && s.classList.remove('open'));
+      sel.classList.toggle('open');
+    });
+    opts.forEach(li => li.addEventListener('click', () => choose(li)));
+    btn.addEventListener('keydown', e => {
+      if (!['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(e.key)) return;
+      e.preventDefault();
+      if (e.key === 'Escape') return close();
+      if (!sel.classList.contains('open')) return sel.classList.add('open');
+      if (e.key === 'Enter' && focus >= 0) return choose(opts[focus]);
+      focus = (focus + (e.key === 'ArrowDown' ? 1 : -1) + opts.length) % opts.length;
+      opts.forEach((o, i) => o.classList.toggle('focused', i === focus));
+    });
+  });
+  document.addEventListener('click', () => document.querySelectorAll('.nb-select.open').forEach(s => s.classList.remove('open')));
+
+  /* ---------------- Formulario → WhatsApp ---------------- */
+  const waForm = document.getElementById('waForm');
+  if (waForm) {
+    waForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('fName').value.trim();
+      const email = document.getElementById('fEmail').value.trim();
+      const prod = document.querySelector('[data-name="producto"]').dataset.value || 'Sin definir';
+      const origin = document.querySelector('[data-name="origen"]').dataset.value || 'Sin definir';
+      const msg = document.getElementById('fMsg').value.trim();
+      if (!name) { document.getElementById('fName').focus(); return; }
+      if (!document.getElementById('fPolicy').checked) { alert('Por favor acepta la Política de tratamiento de datos.'); return; }
+      const text = `¡Hola NEBA Cosmetics! 👋\n\n*Nombre:* ${name}\n*Correo:* ${email || '-'}\n*Presentación:* ${prod}\n*¿Cómo llegué?:* ${origin}\n*Dudas:* ${msg || '-'}`;
+      window.open('https://api.whatsapp.com/send/?phone=573143068117&text=' + encodeURIComponent(text), '_blank');
+    });
+  }
+
+  /* ---------------- Resize del hero ---------------- */
+  window.addEventListener('resize', () => {
+    heroCam.aspect = heroEl.clientWidth / heroEl.clientHeight; heroCam.updateProjectionMatrix();
+    heroR.setSize(heroEl.clientWidth, heroEl.clientHeight);
+  });
+})();
+</script>
+</body>
+</html>

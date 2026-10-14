@@ -1,0 +1,27 @@
+# Blender source files & heavy bakes (60+ MB)
+blender/
+
+# Raw client print assets & design reference documents
+arte_tuboneba.pdf
+info/
+
+# Backups and intermediate HTML versions
+index_v*.html
+seccion_etiqueta_ingredientes.html
+viewer.html
+tubo_3d.html
+caja_3d.html
+export_and_preview.js
+abrir_web.bat
+arte_page_*.png
+label_300dpi_full.png
+tubo_label_texture.*
+tex_neba_*
+Tubo cosmético herbal NEBA-10.png
+NEBA10-imgen.jpeg
+textures_data.js
+
+# OS & Temp
+Thumbs.db
+.DS_Store
+*.tmp
