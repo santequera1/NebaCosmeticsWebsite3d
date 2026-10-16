@@ -448,12 +448,42 @@
     .progress-track { height: 6px; background: rgba(255,255,255,0.7); border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
     .progress-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--green-vibrant), var(--orange)); transform-origin: left; transform: scaleX(.12); }
     .scroll-hint {
-      position: absolute; left: 50%; bottom: 3vh; transform: translateX(-50%); z-index: 6;
-      font-size: .74rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--green-700);
-      font-family: var(--font-title); display: flex; flex-direction: column; align-items: center; gap: 6px;
+      position: absolute; left: 50%; bottom: 2.5vh; transform: translateX(-50%); z-index: 6;
+      font-size: .70rem; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase; color: var(--green-700);
+      font-family: var(--font-title); display: flex; flex-direction: column; align-items: center; gap: 4px;
+      pointer-events: none; user-select: none;
     }
-    .scroll-hint i { width: 2px; height: 26px; background: var(--green-700); border-radius: 2px; animation: drip 1.6s infinite; }
-    @keyframes drip { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+    .scroll-mouse {
+      width: 22px; height: 34px; border: 2px solid currentColor; border-radius: 12px;
+      display: flex; justify-content: center; padding-top: 5px; box-sizing: border-box;
+      opacity: .92;
+    }
+    .scroll-wheel {
+      width: 3px; height: 7px; background: currentColor; border-radius: 2px;
+      animation: mouseScroll 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+    }
+    @keyframes mouseScroll {
+      0% { transform: translateY(0); opacity: 1; }
+      50% { transform: translateY(11px); opacity: 0.15; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .scroll-label {
+      margin-top: 2px;
+    }
+    .scroll-chevrons {
+      display: flex; flex-direction: column; align-items: center; margin-top: -3px;
+    }
+    .scroll-chevrons svg {
+      width: 17px; height: 17px; display: block;
+      animation: chevronPulse 1.6s ease-in-out infinite;
+    }
+    .scroll-chevrons svg:nth-child(2) {
+      margin-top: -10px; animation-delay: 0.22s; opacity: .7;
+    }
+    @keyframes chevronPulse {
+      0%, 100% { transform: translateY(0); opacity: .4; }
+      50% { transform: translateY(6px); opacity: 1; }
+    }
 
     /* ============ BENEFICIOS: ENTRA NATURALMENTE DESPUÉS DE LOS 3 SLIDES DEL HERO ============ */
     .benefits {
@@ -1395,11 +1425,27 @@
         height: 26px !important;
       }
       .scroll-hint {
-        bottom: 1.5vh !important;
-        font-size: 0.68rem;
+        bottom: 1.2vh !important;
+        font-size: 0.62rem !important;
+        letter-spacing: 1.2px !important;
+        gap: 3px !important;
       }
-      .scroll-hint i {
-        height: 18px;
+      .scroll-mouse {
+        width: 18px !important;
+        height: 28px !important;
+        border-width: 1.5px !important;
+        padding-top: 4px !important;
+      }
+      .scroll-wheel {
+        width: 2.5px !important;
+        height: 5px !important;
+      }
+      .scroll-chevrons svg {
+        width: 14px !important;
+        height: 14px !important;
+      }
+      .scroll-chevrons svg:nth-child(2) {
+        margin-top: -8px !important;
       }
 
       /* 4. Scallop Separadores: superior e inferior suaves y botánicos en móvil */
@@ -1471,7 +1517,8 @@
         display: none !important;
       }
       .etq-section {
-        padding: 36px 16px 50px !important;
+        padding: 36px 16px 105px !important;
+        background: linear-gradient(180deg, #f3f9f4 0%, #f3f9f4 62%, #ffffff 100%) !important;
       }
       .etq-wrap {
         gap: 16px !important;
@@ -1537,6 +1584,7 @@
         padding: 48px 5vw !important;
       }
       #nosotros.about {
+        padding-top: 36px !important;
         padding-bottom: 24px !important;
       }
       #comprar.products {
@@ -1748,7 +1796,14 @@
       </div>
     </div>
 
-    <div class="scroll-hint"><span>Desliza</span><i></i></div>
+    <div class="scroll-hint" aria-label="Desliza hacia abajo">
+      <div class="scroll-mouse" aria-hidden="true"><div class="scroll-wheel"></div></div>
+      <span class="scroll-label">DESLIZA HACIA ABAJO</span>
+      <div class="scroll-chevrons" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1806,8 +1861,8 @@
     --etq-title: 'Montserrat', system-ui, sans-serif;
     --etq-body: 'Comfortaa', system-ui, sans-serif;
     position: relative;
-    background: var(--etq-bg);
-    padding: 120px 6vw 140px;
+    background: linear-gradient(180deg, var(--etq-bg) 0%, var(--etq-bg) 70%, #ffffff 100%);
+    padding: 120px 6vw 170px;
   }
   .etq-wrap {
     max-width: 1240px; margin: 0 auto;
