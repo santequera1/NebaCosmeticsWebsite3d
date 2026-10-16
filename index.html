@@ -762,6 +762,16 @@
     .prod-3d { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
     .prod-3d:active { cursor: grabbing; }
     .prod-3d canvas { display: block; width: 100% !important; height: 100% !important; }
+
+    /* Frasco grande de 200g: espacio superior para no colisionar con los botones */
+    .prod-card.c-200 .prod-3d {
+      top: 16px;
+      height: calc(100% - 16px);
+    }
+    .prod-card.c-200 .prod-photo-view {
+      padding-top: 36px;
+    }
+
     .zoom-hint {
       position: absolute; left: 16px; bottom: 14px; z-index: 3;
       font-size: .70rem; font-weight: 700; padding: 6px 12px; border-radius: 999px;
@@ -1547,6 +1557,13 @@
         display: block !important;
         height: 330px !important;
         touch-action: pan-y !important;
+      }
+      .prod-card.c-200 .prod-3d {
+        top: 14px !important;
+        height: calc(330px - 14px) !important;
+      }
+      .prod-card.c-200 .prod-photo-view {
+        padding-top: 32px !important;
       }
       .prod-photo-img {
         height: 220px !important;
@@ -2929,7 +2946,8 @@
     scene.environment = studioEnv(r);
     addLights(scene);
     const cam = new THREE.PerspectiveCamera(26, el.clientWidth / el.clientHeight, 0.01, 20);
-    cam.position.set(0, 0.04, opts.dist);
+    const yCam = opts.yOffset !== undefined ? opts.yOffset : 0.04;
+    cam.position.set(0, yCam, opts.dist);
     const ctl = new THREE.OrbitControls(cam, r.domElement);
 
     // Rotación únicamente horizontal (a los lados) y zoom permitido (acercar/alejar)
@@ -2983,7 +3001,7 @@
 
     el.addEventListener('pointerdown', () => { el.classList.add('zoom-on'); });
     el.addEventListener('pointerleave', () => { el.classList.remove('zoom-on'); });
-    el.addEventListener('dblclick', () => { cam.position.set(0, 0.04, opts.dist); ctl.target.set(0, 0, 0); });
+    el.addEventListener('dblclick', () => { cam.position.set(0, yCam, opts.dist); ctl.target.set(0, 0, 0); });
 
     const cardGroup = new THREE.Group();
     scene.add(cardGroup);
@@ -3031,8 +3049,8 @@
   }
 
   // Inicializar 3D en todas las resoluciones (móvil y PC)
-  initCard('card3d-200', { dist: 2.8, scale: 1 });
-  initCard('card3d-60', { dist: 2.8, scale: 0.78 });
+  initCard('card3d-200', { dist: 3.02, scale: 0.92, yOffset: 0.01 });
+  initCard('card3d-60', { dist: 2.8, scale: 0.78, yOffset: 0.04 });
 
   // Manejador del toggle de vista (3D vs Foto Real)
   document.querySelectorAll('.prod-card').forEach(card => {
