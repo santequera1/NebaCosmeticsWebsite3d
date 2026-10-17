@@ -262,14 +262,17 @@
       position: absolute; right: -6%; bottom: -10%; width: 55vw; max-width: 800px;
       opacity: .08; pointer-events: none;
     }
-    .fs-top { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; }
+    .fs-top { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 10; }
     .fs-top img { height: 52px; width: auto; object-fit: contain; filter: none !important; -webkit-filter: none !important; box-shadow: none !important; }
     .close-btn {
       background: #fff; color: var(--green-800); border: none; cursor: pointer;
       letter-spacing: .8px; font-size: .88rem; font-family: var(--font-title); font-weight: 700;
-      padding: 11px 24px; border-radius: 999px; transition: transform .2s;
+      padding: 11px 24px; border-radius: 999px; transition: transform .2s, background .2s;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none;
+      position: relative; z-index: 11;
     }
     .close-btn:hover { transform: scale(1.05); }
+    .close-btn:active { transform: scale(0.96); }
     .fs-body {
       position: relative; z-index: 2; flex: 1;
       display: grid; grid-template-columns: 1.25fr 1fr; gap: 50px; align-items: center;
@@ -1408,6 +1411,16 @@
       .fs-top {
         justify-content: flex-end !important;
         margin-bottom: 10px;
+        position: relative;
+        z-index: 30;
+      }
+      .close-btn {
+        padding: 10px 22px !important;
+        font-size: 0.82rem !important;
+        cursor: pointer !important;
+        pointer-events: auto !important;
+        touch-action: manipulation !important;
+        -webkit-tap-highlight-color: transparent !important;
       }
       .fs-logo-mobile {
         display: flex !important;
@@ -2813,6 +2826,20 @@
   const openBtn = document.getElementById('openMenu');
   const closeBtn = document.getElementById('closeMenu');
   if (openBtn) openBtn.addEventListener('click', openMenu);
+  if (closeBtn) {
+    ['click', 'touchend'].forEach(evt => {
+      closeBtn.addEventListener(evt, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMenu();
+      }, { passive: false });
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && fsMenu && fsMenu.classList.contains('open')) {
+      closeMenu();
+    }
+  });
   fsMenu.querySelectorAll('a').forEach(a => {
     a.addEventListener('click', (e) => {
       closeMenu();
